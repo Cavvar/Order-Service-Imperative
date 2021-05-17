@@ -1,0 +1,309 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: Order-Service API
+  description: An API providing basic ordering capabilities
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Cavvar-Solo/Order-ServiceAPIAlternative/1.0
+tags:
+  - name: orders
+    description: Available ordering operations
+paths:
+  /orders:
+    get:
+      tags:
+        - orders
+      summary: Get all available orders
+      operationId: getAllOrders
+      responses:
+        '200':
+          description: OK. Collection of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      tags:
+        - orders
+      summary: Create a new order
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        '200':
+          description: OK. Order was successfully created
+        '400':
+          description: Invalid Input
+        '406':
+          description: Not acceptable. Payment was not authorized
+  /orders/{orderId}:
+    get:
+      tags:
+        - orders
+      summary: Get an order by order id
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK. Order Details were successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order was not found
+    delete:
+      tags:
+        - orders
+      summary: Delete an order
+      operationId: deleteOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK. The Order was successfully deleted
+        '404':
+          description: Order was not found
+  /orders/{orderId}/items:
+    get:
+      tags:
+        - orders
+      summary: Get all items of an order
+      operationId: getAllItemsFromOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK. Collection of items from an order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        '404':
+          description: Order was not found
+    post:
+      tags:
+        - orders
+      summary: Add an item to an order
+      operationId: addItemToOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Item to add to the order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '200':
+          description: OK. A new item was added to the order
+        '404':
+          description: Order was not found
+  /orders/{orderId}/items/{itemId}:
+    get:
+      tags:
+        - orders
+      summary: Get the item from an order
+      operationId: getItemFromOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: itemId
+          in: path
+          description: Item ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK. Retrieved item was returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '404':
+          description: Order was not found
+    delete:
+      tags:
+        - orders
+      summary: Delete an item from an order
+      operationId: deleteItemFromOrder
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: itemId
+          in: path
+          description: Item ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK. Item was successfully deleted
+        '404':
+          description: Order was not found
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 0113e960-b22f-11eb-8529-0242ac130003
+        customer:
+          $ref: '#/components/schemas/Customer'
+        address:
+          $ref: '#/components/schemas/Address'
+        card:
+          $ref: '#/components/schemas/Card'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        date:
+          type: string
+          format: date
+        total:
+          type: number
+          example: 125.33
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 017263ba-b22e-11eb-8529-0242ac130003
+        firstName:
+          type: string
+          example: Max
+        lastName:
+          type: string
+          example: Mustermann
+        userName:
+          type: string
+          example: Username
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b7c1459c-b22d-11eb-8529-0242ac130003
+        longNum:
+          type: string
+          example: 1234-5678-9012-3456
+        expires:
+          type: string
+          example: 08/89
+        ccv:
+          type: string
+          example: 123
+    Item:
+      type: object
+      required:
+        - itemId
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f280f1ee-6c54-4b01-92e6-d701908f0851
+        name:
+          type: string
+          example: TV-Screen
+        quantity:
+          type: integer
+          example: 20
+        unitPrice:
+          type: number
+          example: 20.50
+    Address:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1234
+        number:
+          type: string
+          example: 111
+        street:
+          type: string
+          example: Example Street
+        city:
+          type: string
+          example: Munich
+        postcode:
+          type: string
+          example: 80689
+        country:
+          type: string
+          example: Germany
+    NewOrder:
+      type: object
+      properties:
+        customer:
+          type: string
+          format: uri
+        address:
+          type: string
+          format: uri
+        card:
+          type: string
+          format: uri
+        items:
+          type: string
+          format: uri
