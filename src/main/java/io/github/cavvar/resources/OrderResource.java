@@ -47,6 +47,7 @@ public class OrderResource {
     @DELETE
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     public void deleteOrder(@PathParam("orderId") String orderId) {
         orderService.deleteOrder(orderId);
     }
@@ -62,6 +63,7 @@ public class OrderResource {
     @Path("{orderId}/items")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     public void addItemToOrder(@PathParam("orderId") String orderId, Item itemToAdd) {
         orderService.addItemToOrder(orderId, itemToAdd);
     }
@@ -76,6 +78,7 @@ public class OrderResource {
     @DELETE
     @Path("{orderId}/items/{itemId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     public void deleteItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
         orderService.deleteItemFromOrder(orderId, itemId);
     }
