@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
-import javax.persistence.Id;
 import java.util.List;
 
 @Data
@@ -14,8 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Embeddable//https://memorynotfound.com/hibernate-embeddable-embedded-annotation-example/
 public class Customer {
-    @Id
-    private String id;
+    private String customerId;
     private String firstName;
     private String lastName;
     private String userName;
@@ -23,12 +21,4 @@ public class Customer {
     private List<Address> addresses;
     @ElementCollection
     private List<Card> cards;
-
-    public Customer(String firstName, String lastName, String userName, List<Address> addresses, List<Card> cards) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userName = userName;
-        this.addresses = addresses;
-        this.cards = cards;
-    }
 }

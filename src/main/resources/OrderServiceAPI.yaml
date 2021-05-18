@@ -256,7 +256,7 @@ components:
     Item:
       type: object
       required:
-        - itemId
+        - id
       properties:
         id:
           type: string
