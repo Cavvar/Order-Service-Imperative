@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +18,8 @@ import java.util.List;
 @Entity(name = "orders")
 public class Order {
     @Id
-    private String id;
+    @GeneratedValue
+    private int id;
     @Embedded
     private Customer customer;
     @Embedded
@@ -28,4 +30,13 @@ public class Order {
     private List<Item> items;
     private Date date;
     private double total;
+
+    public Order(Customer customer, Address address, Card card, List<Item> items, Date date, double total) {
+        this.customer = customer;
+        this.address = address;
+        this.card = card;
+        this.items = items;
+        this.date = date;
+        this.total = total;
+    }
 }

@@ -17,10 +17,10 @@ public class MockAddressService extends LiveAddressService {
     @Override
     public Address getAddress(URI address) {
         final List<Address> addresses = new ArrayList<>();
-        addresses.add(new Address(UUID.randomUUID().toString(), "123", "ExampleStreet", "Berlin", "12345", "Germany"));
-        addresses.add(new Address(UUID.randomUUID().toString(), "1", "Wall Street", "New York", "67234", "United States of America"));
-        addresses.add(new Address(UUID.randomUUID().toString(), "244", "Leopoldstraße", "Munich", "80678", "Germany"));
-        addresses.add(new Address(UUID.randomUUID().toString(), "67", "Via Roma", "Rome", "33448", "Italy"));
+        addresses.add(new Address(1, "123", "ExampleStreet", "Berlin", "12345", "Germany"));
+        addresses.add(new Address(2, "1", "Wall Street", "New York", "67234", "United States of America"));
+        addresses.add(new Address(3, "244", "Leopoldstraße", "Munich", "80678", "Germany"));
+        addresses.add(new Address(4, "67", "Via Roma", "Rome", "33448", "Italy"));
         final int randomIndex = (int) (Math.random() * 3);
         return addresses.get(randomIndex);
     }

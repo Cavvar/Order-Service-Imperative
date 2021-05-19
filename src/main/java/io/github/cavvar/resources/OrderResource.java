@@ -39,7 +39,7 @@ public class OrderResource {
     @GET
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOrder(@PathParam("orderId") String orderId) {
+    public Response getOrder(@PathParam("orderId") int orderId) {
         return orderService.getOrder(orderId);
     }
 
@@ -47,14 +47,14 @@ public class OrderResource {
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response deleteOrder(@PathParam("orderId") String orderId) {
+    public Response deleteOrder(@PathParam("orderId") int orderId) {
         return orderService.deleteOrder(orderId);
     }
 
     @GET
     @Path("{orderId}/items")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllItemsFromOrder(@PathParam("orderId") String orderId) {
+    public Response getAllItemsFromOrder(@PathParam("orderId") int orderId) {
         return orderService.getAllItemsFromOrder(orderId);
     }
 
@@ -63,14 +63,14 @@ public class OrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response addItemToOrder(@PathParam("orderId") String orderId, Item itemToAdd) {
+    public Response addItemToOrder(@PathParam("orderId") int orderId, Item itemToAdd) {
         return orderService.addItemToOrder(orderId, itemToAdd);
     }
 
     @GET
     @Path("{orderId}/items/{itemId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
+    public Response getItemFromOrder(@PathParam("orderId") int orderId, @PathParam("itemId") int itemId) {
         return orderService.getItemFromOrder(orderId, itemId);
     }
 
@@ -78,7 +78,7 @@ public class OrderResource {
     @Path("{orderId}/items/{itemId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response deleteItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
+    public Response deleteItemFromOrder(@PathParam("orderId") int orderId, @PathParam("itemId") int itemId) {
         return orderService.deleteItemFromOrder(orderId, itemId);
     }
 }

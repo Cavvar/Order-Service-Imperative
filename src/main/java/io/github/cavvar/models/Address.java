@@ -11,7 +11,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @Embeddable
 public class Address {
-    private String addressId;
+    private int addressId;
     private String number;
     private String street;
     private String city;

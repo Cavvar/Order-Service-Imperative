@@ -11,7 +11,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @Embeddable
 public class Item {
-    private String itemId;
+    private int itemId;
     private String name;
     private int quantity;
     private double unitPrice;

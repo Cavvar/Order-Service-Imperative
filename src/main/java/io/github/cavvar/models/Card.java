@@ -11,7 +11,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @Embeddable
 public class Card {
-    private String cardId;
+    private int cardId;
     private String longNum;
     private String expires;
     private String ccv;
