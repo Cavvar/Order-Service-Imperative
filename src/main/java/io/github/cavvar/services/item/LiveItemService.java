@@ -19,6 +19,6 @@ public class LiveItemService {
     public List<Item> getItems(URI items) throws ExecutionException, InterruptedException, TimeoutException {
         final Client client = ClientBuilder.newClient();
         final Future<List<Item>> futureItems = client.target(items).request().async().get(new OrderServiceInvocationCallback<>());
-        return futureItems.get(Constants.timeoutValue, TimeUnit.SECONDS);
+        return futureItems.get(Constants.TIMEOUT_VALUE, TimeUnit.SECONDS);
     }
 }

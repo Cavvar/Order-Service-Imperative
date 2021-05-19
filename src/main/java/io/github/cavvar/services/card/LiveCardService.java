@@ -18,6 +18,6 @@ public class LiveCardService {
     public Card getCard(URI card) throws ExecutionException, InterruptedException, TimeoutException {
         final Client client = ClientBuilder.newClient();
         final Future<Card> futureCard = client.target(card).request().async().get(new OrderServiceInvocationCallback<>());
-        return futureCard.get(Constants.timeoutValue, TimeUnit.SECONDS);
+        return futureCard.get(Constants.TIMEOUT_VALUE, TimeUnit.SECONDS);
     }
 }

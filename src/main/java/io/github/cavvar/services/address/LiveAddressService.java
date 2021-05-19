@@ -18,6 +18,6 @@ public class LiveAddressService {
     public Address getAddress(URI address) throws ExecutionException, InterruptedException, TimeoutException {
         final Client client = ClientBuilder.newClient();
         final Future<Address> futureAddress = client.target(address).request().async().get(new OrderServiceInvocationCallback<>());
-        return futureAddress.get(Constants.timeoutValue, TimeUnit.SECONDS);
+        return futureAddress.get(Constants.TIMEOUT_VALUE, TimeUnit.SECONDS);
     }
 }

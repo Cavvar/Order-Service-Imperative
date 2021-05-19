@@ -17,8 +17,8 @@ import java.util.concurrent.TimeoutException;
 public class LivePaymentService {
     public PaymentResponse getPayment(PaymentRequest paymentRequest) throws ExecutionException, InterruptedException, TimeoutException {
         final Client client = ClientBuilder.newClient();
-        final Future<PaymentResponse> futurePayment = client.target("http://localhost:8082/paymentAuth").request().async().post(Entity.json(paymentRequest),
+        final Future<PaymentResponse> futurePayment = client.target(Constants.PAYMENT_SERVICE_URL).request().async().post(Entity.json(paymentRequest),
                 PaymentResponse.class);
-        return futurePayment.get(Constants.timeoutValue, TimeUnit.SECONDS);
+        return futurePayment.get(Constants.TIMEOUT_VALUE, TimeUnit.SECONDS);
     }
 }
