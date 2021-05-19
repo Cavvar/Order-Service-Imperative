@@ -17,7 +17,8 @@ import io.github.cavvar.services.payment.LivePaymentService;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -48,15 +49,16 @@ public class OrderService {
     @Inject
     LivePaymentService paymentService;
 
-    public List<Order> getAllOrders() {
-        return entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
+    public Response getAllOrders() {
+        final List<Order> allOrders = entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
+        return Response.status(Response.Status.OK).entity(allOrders).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
-    public Order postOrder(NewOrder newOrder) {
+    public Response postOrder(NewOrder newOrder) {
         try {
             // Validate new order input
             if (newOrder.address == null || newOrder.customer == null || newOrder.card == null || newOrder.items == null) {
-                throw new WebApplicationException("Invalid Input", 400);
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Input").type(MediaType.TEXT_PLAIN_TYPE).build();
             }
             // Retrieve newOrder data through hypermedia links
             final Address address = addressService.getAddress(newOrder.address);
@@ -76,7 +78,7 @@ public class OrderService {
                     totalSum);
             final PaymentResponse paymentResponse = paymentService.getPayment(paymentRequest);
             if (!paymentResponse.isAuthorised()) {
-                throw new WebApplicationException("Payment was not authorised!", 406);
+                return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Payment was not authorised!").type(MediaType.TEXT_PLAIN_TYPE).build();
             }
             final Order newCustomerOrder = new Order(
                     UUID.randomUUID().toString(),
@@ -87,50 +89,71 @@ public class OrderService {
                     Calendar.getInstance().getTime(),
                     totalSum);
             entityManager.persist(newCustomerOrder);
-            return newCustomerOrder;
+            return Response.status(Response.Status.OK).entity(newCustomerOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             throw new IllegalStateException(String.format("Unable to create order. %s", ex.getMessage()));
         }
     }
 
-    public Order getOrder(String orderId) {
-        return retrieveOrder(orderId);
-    }
-
-    public void deleteOrder(String orderId) {
-        final Order orderToBeDeleted = retrieveOrder(orderId);
-        entityManager.remove(orderToBeDeleted);
-    }
-
-    public List<Item> getAllItemsFromOrder(String orderId) {
-        return retrieveOrder(orderId).getItems();
-    }
-
-    public void addItemToOrder(String orderId, Item itemToAdd) {
-        retrieveOrder(orderId).getItems().add(itemToAdd);
-    }
-
-    public Item getItemFromOrder(String orderId, String itemId) {
-        final Optional<Item> retrievedItem = retrieveOrder(orderId).getItems().stream().filter(item -> item.getItemId().equals(itemId)).findFirst();
-        if (retrievedItem.isEmpty()) {
-            throw new WebApplicationException("Item was not found", 404);
-        }
-        return retrievedItem.get();
-    }
-
-    public void deleteItemFromOrder(String orderId, String itemId) {
+    public Response getOrder(String orderId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        final List<Item> newItems = retrievedOrder.getItems().stream().filter(item -> !item.getItemId().equals(itemId)).collect(Collectors.toList());
-        retrievedOrder.getItems().clear();
-        retrievedOrder.getItems().addAll(newItems);
-        entityManager.flush();
+        if (Objects.nonNull(retrievedOrder)) {
+            return Response.status(Response.Status.OK).entity(retrievedOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    public Response deleteOrder(String orderId) {
+        final Order orderToBeDeleted = retrieveOrder(orderId);
+        if (Objects.nonNull(orderToBeDeleted)) {
+            entityManager.remove(orderToBeDeleted);
+            return Response.status(Response.Status.OK).entity("The order was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    public Response getAllItemsFromOrder(String orderId) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        if (Objects.nonNull(retrievedOrder)) {
+            return Response.status(Response.Status.OK).entity(retrievedOrder.getItems()).type(MediaType.APPLICATION_JSON_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    public Response addItemToOrder(String orderId, Item itemToAdd) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        if (Objects.nonNull(retrievedOrder)) {
+            retrievedOrder.getItems().add(itemToAdd);
+            return Response.status(Response.Status.OK).entity("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    public Response getItemFromOrder(String orderId, String itemId) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        if (Objects.nonNull(retrievedOrder)) {
+            final Optional<Item> retrievedItem = retrievedOrder.getItems().stream().filter(item -> item.getItemId().equals(itemId)).findFirst();
+            if (retrievedItem.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Item could not be found").type(MediaType.TEXT_PLAIN_TYPE).build();
+            }
+            return Response.status(Response.Status.OK).entity(retrievedItem.get()).type(MediaType.APPLICATION_JSON_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order could not be found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    public Response deleteItemFromOrder(String orderId, String itemId) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        if (Objects.nonNull(retrievedOrder)) {
+            final List<Item> newItems = retrievedOrder.getItems().stream().filter(item -> !item.getItemId().equals(itemId)).collect(Collectors.toList());
+            retrievedOrder.getItems().clear();
+            retrievedOrder.getItems().addAll(newItems);
+            entityManager.flush();
+            return Response.status(Response.Status.OK).entity("Item was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order or Item were not found").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     private Order retrieveOrder(String orderId) {
-        final Order retrievedOrder = entityManager.find(Order.class, orderId);
-        if (Objects.isNull(retrievedOrder)) {
-            throw new WebApplicationException("Order was not found", 404);
-        }
-        return retrievedOrder;
+        return entityManager.find(Order.class, orderId);
     }
 }

@@ -2,7 +2,6 @@ package io.github.cavvar.resources;
 
 import io.github.cavvar.models.Item;
 import io.github.cavvar.models.NewOrder;
-import io.github.cavvar.models.Order;
 import io.github.cavvar.services.OrderService;
 
 import javax.inject.Inject;
@@ -15,7 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import javax.ws.rs.core.Response;
 
 @Path("/orders")
 public class OrderResource {
@@ -25,7 +24,7 @@ public class OrderResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Order> getAllOrders() {
+    public Response getAllOrders() {
         return orderService.getAllOrders();
     }
 
@@ -33,14 +32,14 @@ public class OrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Order createOrder(NewOrder newOrder) {
+    public Response createOrder(NewOrder newOrder) {
         return orderService.postOrder(newOrder);
     }
 
     @GET
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Order getOrder(@PathParam("orderId") String orderId) {
+    public Response getOrder(@PathParam("orderId") String orderId) {
         return orderService.getOrder(orderId);
     }
 
@@ -48,14 +47,14 @@ public class OrderResource {
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public void deleteOrder(@PathParam("orderId") String orderId) {
-        orderService.deleteOrder(orderId);
+    public Response deleteOrder(@PathParam("orderId") String orderId) {
+        return orderService.deleteOrder(orderId);
     }
 
     @GET
     @Path("{orderId}/items")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Item> getAllItemsFromOrder(@PathParam("orderId") String orderId) {
+    public Response getAllItemsFromOrder(@PathParam("orderId") String orderId) {
         return orderService.getAllItemsFromOrder(orderId);
     }
 
@@ -64,14 +63,14 @@ public class OrderResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public void addItemToOrder(@PathParam("orderId") String orderId, Item itemToAdd) {
-        orderService.addItemToOrder(orderId, itemToAdd);
+    public Response addItemToOrder(@PathParam("orderId") String orderId, Item itemToAdd) {
+        return orderService.addItemToOrder(orderId, itemToAdd);
     }
 
     @GET
     @Path("{orderId}/items/{itemId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Item getItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
+    public Response getItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
         return orderService.getItemFromOrder(orderId, itemId);
     }
 
@@ -79,7 +78,7 @@ public class OrderResource {
     @Path("{orderId}/items/{itemId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public void deleteItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
-        orderService.deleteItemFromOrder(orderId, itemId);
+    public Response deleteItemFromOrder(@PathParam("orderId") String orderId, @PathParam("itemId") String itemId) {
+        return orderService.deleteItemFromOrder(orderId, itemId);
     }
 }
