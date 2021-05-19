@@ -101,6 +101,16 @@ public class OrderService {
         return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
+    public Response updateCardOfOrder(int orderId, Card newCard) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        if (Objects.nonNull(retrievedOrder)) {
+            retrievedOrder.setCard(newCard);
+            entityManager.flush();
+            return Response.status(Response.Status.OK).entity("Card Information was successfully updated").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
     public Response deleteOrder(int orderId) {
         final Order orderToBeDeleted = retrieveOrder(orderId);
         if (Objects.nonNull(orderToBeDeleted)) {
