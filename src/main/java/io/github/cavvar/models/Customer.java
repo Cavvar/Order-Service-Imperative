@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable//https://memorynotfound.com/hibernate-embeddable-embedded-annotation-example/
+@Embeddable
 public class Customer {
     private String customerId;
     private String firstName;
