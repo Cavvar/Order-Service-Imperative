@@ -1,4 +1,3 @@
--- TODO
 INSERT INTO orders (id, addressid, city, country, number, postcode, street, cardid, ccv, expires, longnum, customerid, firstname, lastname, username, date, total)
 VALUES (1, 1, 'Berlin', 'Germany', '123', '12345', 'ExampleStreet', 1, '789', '12/39', '9012-3456-5678-1234', 1, 'Max', 'Mustermann', 'Mustername', '2021-05-21 08:51:41.754', 54.5);
 INSERT INTO orders (id, addressid, city, country, number, postcode, street, cardid, ccv, expires, longnum, customerid, firstname, lastname, username, date, total)
