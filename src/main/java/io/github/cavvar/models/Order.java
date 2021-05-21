@@ -9,6 +9,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,8 @@ import java.util.List;
 @Entity(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue
+    @SequenceGenerator(name = "ordersSequence", sequenceName = "known_orders_id_seq", allocationSize = 1, initialValue = 5)
+    @GeneratedValue(generator = "ordersSequence")
     private int id;
     @Embedded
     private Customer customer;

@@ -22,19 +22,19 @@ public class MockCustomerService extends LiveCustomerService {
         final Address exampleAddress = new Address(5, "123", "Example Street", "Cologne", "55432", "Germany");
         final Card exampleCard = new Card(5, "1234-5678-9012-3456", "01/99", "123");
         customers.add(
-                new Customer(1, "Max", "Mustermann", "Mustername",
+                new Customer(5, "Max", "Mustermann", "Mustername",
                         Collections.singletonList(exampleAddress),
                         Collections.singletonList(exampleCard)));
         customers.add(
-                new Customer(2, "Alberta", "FamilyName", "RandomOnlineUsername",
+                new Customer(6, "Alberta", "FamilyName", "RandomOnlineUsername",
                         Collections.singletonList(exampleAddress),
                         Collections.singletonList(exampleCard)));
         customers.add(
-                new Customer(3, "Evelyn", "Schmidt", "EvelynSchmidt",
+                new Customer(7, "Evelyn", "Schmidt", "EvelynSchmidt",
                         Collections.singletonList(exampleAddress),
                         Collections.singletonList(exampleCard)));
         customers.add(
-                new Customer(4, "Alex", "Schneider", "AlexSchneider",
+                new Customer(8, "Alex", "Schneider", "AlexSchneider",
                         Collections.singletonList(exampleAddress),
                         Collections.singletonList(exampleCard)));
         final int randomIndex = (int) (Math.random() * 3);
