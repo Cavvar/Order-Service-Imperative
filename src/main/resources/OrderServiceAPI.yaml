@@ -4,9 +4,8 @@ info:
   title: Order-Service API
   description: An API providing basic ordering capabilities
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/Cavvar-Solo/Order-ServiceAPIAlternative/1.0
+  - description: Local Order-Service API
+    url: https://localhost:8080
 tags:
   - name: orders
     description: Available ordering operations
@@ -40,7 +39,7 @@ paths:
         '200':
           description: OK. Order was successfully created
         '400':
-          description: Invalid Input
+          description: Invalid Input. The request payload contains invalid data
         '406':
           description: Not acceptable. Payment was not authorized
   /orders/{orderId}:
@@ -64,7 +63,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
         '404':
-          description: Order was not found
+          description: Not found. Order was not found
     put:
       tags:
         - orders
@@ -127,7 +126,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Item'
         '404':
-          description: Order was not found
+          description: Not found. Order was not found
     post:
       tags:
         - orders
@@ -150,7 +149,7 @@ paths:
         '200':
           description: OK. A new item was added to the order
         '404':
-          description: Order was not found
+          description: Not found. Order was not found
   /orders/{orderId}/items/{itemId}:
     get:
       tags:
@@ -178,7 +177,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Item'
         '404':
-          description: Order or Item were not found
+          description: Not found. Order or Item were not found
     delete:
       tags:
         - orders
@@ -201,7 +200,7 @@ paths:
         '200':
           description: OK. Item was successfully deleted
         '404':
-          description: Order or Item were not found
+          description: Not found. Order or Item were not found
 components:
   schemas:
     Order:
@@ -266,8 +265,6 @@ components:
           example: 123
     Item:
       type: object
-      required:
-        - id
       properties:
         id:
           type: integer
