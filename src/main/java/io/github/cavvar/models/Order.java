@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +33,7 @@ public class Order {
     @OneToOne
     @JoinColumn(name = "card_id")
     private Card card;
-    @OneToMany
+    @ManyToMany
     private List<Item> items;
     private Date date;
     private double total;
