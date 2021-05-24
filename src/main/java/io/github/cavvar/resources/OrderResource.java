@@ -40,7 +40,15 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createOrder(NewOrder newOrder) {
-        return orderService.postOrder(newOrder);
+        if (newOrder.address == null || newOrder.customer == null || newOrder.card == null || newOrder.items == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Input").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        try {
+            final Order newCustomerOrder = orderService.postOrder(newOrder);
+            return Response.status(Response.Status.OK).entity(newCustomerOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
+        } catch (IllegalStateException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
     }
 
     @GET

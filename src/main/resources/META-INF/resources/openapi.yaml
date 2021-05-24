@@ -40,8 +40,8 @@ paths:
           description: OK. Order was successfully created
         '400':
           description: Invalid Input. The request payload contains invalid data
-        '406':
-          description: Not acceptable. Payment was not authorized
+        '500':
+          description: Internal Server Error. Unable to create order
   /orders/{orderId}:
     get:
       tags:

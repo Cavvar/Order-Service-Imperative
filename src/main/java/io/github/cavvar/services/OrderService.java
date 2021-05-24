@@ -13,12 +13,11 @@ import io.github.cavvar.services.card.LiveCardService;
 import io.github.cavvar.services.customer.LiveCustomerService;
 import io.github.cavvar.services.item.LiveItemService;
 import io.github.cavvar.services.payment.LivePaymentService;
+import io.github.cavvar.utility.PaymentNotAuthorisedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -49,12 +48,8 @@ public class OrderService {
         return entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
     }
 
-    public Response postOrder(NewOrder newOrder) {
+    public Order postOrder(NewOrder newOrder) {
         try {
-            // Validate new order input
-            if (newOrder.address == null || newOrder.customer == null || newOrder.card == null || newOrder.items == null) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Input").type(MediaType.TEXT_PLAIN_TYPE).build();
-            }
             // Retrieve newOrder data through hypermedia links
             final Address address = addressService.getAddress(newOrder.address);
             final Customer customer = customerService.getCustomer(newOrder.customer);
@@ -66,12 +61,12 @@ public class OrderService {
             final PaymentRequest paymentRequest = new PaymentRequest(address, card, customer, totalSum);
             final PaymentResponse paymentResponse = paymentService.getPayment(paymentRequest);
             if (!paymentResponse.isAuthorised()) {
-                return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Payment was not authorised!").type(MediaType.TEXT_PLAIN_TYPE).build();
+                throw new PaymentNotAuthorisedException();
             }
             final Order newCustomerOrder = new Order(customer, address, card, items, Calendar.getInstance().getTime(), totalSum);
             entityManager.persist(newCustomerOrder);
-            return Response.status(Response.Status.OK).entity(newCustomerOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
-        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            return newCustomerOrder;
+        } catch (InterruptedException | ExecutionException | TimeoutException | PaymentNotAuthorisedException ex) {
             throw new IllegalStateException(String.format("Unable to create order. %s", ex.getMessage()));
         }
     }
