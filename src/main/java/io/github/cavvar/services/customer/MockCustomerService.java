@@ -1,7 +1,5 @@
 package io.github.cavvar.services.customer;
 
-import io.github.cavvar.models.Address;
-import io.github.cavvar.models.Card;
 import io.github.cavvar.models.Customer;
 
 import javax.annotation.Priority;
@@ -9,7 +7,6 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Alternative
@@ -19,24 +16,14 @@ public class MockCustomerService extends LiveCustomerService {
     @Override
     public Customer getCustomer(URI customer) {
         final List<Customer> customers = new ArrayList<>();
-        final Address exampleAddress = new Address(5, "123", "Example Street", "Cologne", "55432", "Germany");
-        final Card exampleCard = new Card(5, "1234-5678-9012-3456", "01/99", "123");
         customers.add(
-                new Customer(5, "Max", "Mustermann", "Mustername",
-                        Collections.singletonList(exampleAddress),
-                        Collections.singletonList(exampleCard)));
+                new Customer(1, "Max", "Mustermann", "Mustername"));
         customers.add(
-                new Customer(6, "Alberta", "FamilyName", "RandomOnlineUsername",
-                        Collections.singletonList(exampleAddress),
-                        Collections.singletonList(exampleCard)));
+                new Customer(2, "Alberta", "FamilyName", "RandomOnlineUsername"));
         customers.add(
-                new Customer(7, "Evelyn", "Schmidt", "EvelynSchmidt",
-                        Collections.singletonList(exampleAddress),
-                        Collections.singletonList(exampleCard)));
+                new Customer(3, "Evelyn", "Schmidt", "EvelynSchmidt"));
         customers.add(
-                new Customer(8, "Alex", "Schneider", "AlexSchneider",
-                        Collections.singletonList(exampleAddress),
-                        Collections.singletonList(exampleCard)));
+                new Customer(4, "Alex", "Schneider", "AlexSchneider"));
         final int randomIndex = (int) (Math.random() * 3);
         return customers.get(randomIndex);
     }

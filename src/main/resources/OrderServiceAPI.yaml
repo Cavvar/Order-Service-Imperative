@@ -240,14 +240,6 @@ components:
         userName:
           type: string
           example: Username
-        addresses:
-          type: array
-          items:
-            $ref: '#/components/schemas/Address'
-        cards:
-          type: array
-          items:
-            $ref: '#/components/schemas/Card'
     Card:
       type: object
       properties:

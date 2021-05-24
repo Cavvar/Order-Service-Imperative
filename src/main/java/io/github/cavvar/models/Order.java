@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Embedded;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.util.Date;
 import java.util.List;
 
@@ -19,16 +21,19 @@ import java.util.List;
 @Entity(name = "orders")
 public class Order {
     @Id
-    @SequenceGenerator(name = "ordersSequence", sequenceName = "known_orders_id_seq", allocationSize = 1, initialValue = 5)
-    @GeneratedValue(generator = "ordersSequence")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "order_id")
     private int id;
-    @Embedded
+    @OneToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
-    @Embedded
+    @OneToOne
+    @JoinColumn(name = "address_id")
     private Address address;
-    @Embedded
+    @OneToOne
+    @JoinColumn(name = "card_id")
     private Card card;
-    @ElementCollection
+    @OneToMany
     private List<Item> items;
     private Date date;
     private double total;
