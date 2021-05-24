@@ -48,9 +48,8 @@ public class OrderService {
     @Inject
     LivePaymentService paymentService;
 
-    public Response getAllOrders() {
-        final List<Order> allOrders = entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
-        return Response.status(Response.Status.OK).entity(allOrders).type(MediaType.APPLICATION_JSON_TYPE).build();
+    public List<Order> getAllOrders() {
+        return entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
     }
 
     public Response postOrder(NewOrder newOrder) {
@@ -65,27 +64,14 @@ public class OrderService {
             final Card card = cardService.getCard(newOrder.card);
             final List<Item> items = itemService.getItems(newOrder.items);
             // Calculate total sum to be paid
-            final double totalSum = items
-                    .stream()
-                    .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
-                    .sum();
+            final double totalSum = items.stream().mapToDouble(item -> item.getQuantity() * item.getUnitPrice()).sum();
             // Call to Payment Service
-            final PaymentRequest paymentRequest = new PaymentRequest(
-                    address,
-                    card,
-                    customer,
-                    totalSum);
+            final PaymentRequest paymentRequest = new PaymentRequest(address, card, customer, totalSum);
             final PaymentResponse paymentResponse = paymentService.getPayment(paymentRequest);
             if (!paymentResponse.isAuthorised()) {
                 return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Payment was not authorised!").type(MediaType.TEXT_PLAIN_TYPE).build();
             }
-            final Order newCustomerOrder = new Order(
-                    customer,
-                    address,
-                    card,
-                    items,
-                    Calendar.getInstance().getTime(),
-                    totalSum);
+            final Order newCustomerOrder = new Order(customer, address, card, items, Calendar.getInstance().getTime(), totalSum);
             entityManager.persist(newCustomerOrder);
             return Response.status(Response.Status.OK).entity(newCustomerOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -93,12 +79,8 @@ public class OrderService {
         }
     }
 
-    public Response getOrder(int orderId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        if (Objects.nonNull(retrievedOrder)) {
-            return Response.status(Response.Status.OK).entity(retrievedOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+    public Order getOrder(int orderId) {
+        return retrieveOrder(orderId);
     }
 
     public Response updateCardOfOrder(int orderId, Card newCard) {

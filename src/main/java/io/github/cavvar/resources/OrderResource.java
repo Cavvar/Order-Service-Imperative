@@ -3,6 +3,7 @@ package io.github.cavvar.resources;
 import io.github.cavvar.models.Card;
 import io.github.cavvar.models.Item;
 import io.github.cavvar.models.NewOrder;
+import io.github.cavvar.models.Order;
 import io.github.cavvar.services.OrderService;
 
 import javax.inject.Inject;
@@ -17,6 +18,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Objects;
 
 @Path("/orders")
 public class OrderResource {
@@ -27,7 +30,8 @@ public class OrderResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllOrders() {
-        return orderService.getAllOrders();
+        final List<Order> allOrders = orderService.getAllOrders();
+        return Response.status(Response.Status.OK).entity(allOrders).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @POST
@@ -42,7 +46,11 @@ public class OrderResource {
     @Path("{orderId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrder(@PathParam("orderId") int orderId) {
-        return orderService.getOrder(orderId);
+        final Order retrievedOrder = orderService.getOrder(orderId);
+        if (Objects.isNull(retrievedOrder)) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.OK).entity(retrievedOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @PUT
