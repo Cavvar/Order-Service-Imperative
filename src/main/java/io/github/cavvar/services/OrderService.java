@@ -21,11 +21,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OrderService {
@@ -64,7 +61,7 @@ public class OrderService {
             final Card card = cardService.getCard(newOrder.card);
             final List<Item> items = itemService.getItems(newOrder.items);
             // Calculate total sum to be paid
-            final double totalSum = items.stream().mapToDouble(item -> item.getQuantity() * item.getUnitPrice()).sum();
+            final double totalSum = calculateTotal(items);
             // Call to Payment Service
             final PaymentRequest paymentRequest = new PaymentRequest(address, card, customer, totalSum);
             final PaymentResponse paymentResponse = paymentService.getPayment(paymentRequest);
@@ -83,67 +80,53 @@ public class OrderService {
         return retrieveOrder(orderId);
     }
 
-    public Response updateCardOfOrder(int orderId, Card newCard) {
+    public void updateCardOfOrder(int orderId, Card newCard) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        if (Objects.nonNull(retrievedOrder)) {
-            retrievedOrder.setCard(newCard);
-            entityManager.flush();
-            return Response.status(Response.Status.OK).entity("Card Information was successfully updated").type(MediaType.TEXT_PLAIN_TYPE).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        retrievedOrder.setCard(newCard);
+        entityManager.flush();
     }
 
-    public Response deleteOrder(int orderId) {
+    public void deleteOrder(int orderId) {
         final Order orderToBeDeleted = retrieveOrder(orderId);
-        if (Objects.nonNull(orderToBeDeleted)) {
-            entityManager.remove(orderToBeDeleted);
-            return Response.status(Response.Status.OK).entity("The order was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        entityManager.remove(orderToBeDeleted);
     }
 
-    public Response getAllItemsFromOrder(int orderId) {
+    public List<Item> getAllItemsFromOrder(int orderId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        if (Objects.nonNull(retrievedOrder)) {
-            return Response.status(Response.Status.OK).entity(retrievedOrder.getItems()).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        return retrievedOrder.getItems();
     }
 
-    public Response addItemToOrder(int orderId, Item itemToAdd) {
+    public boolean addItemToOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        if (Objects.nonNull(retrievedOrder)) {
-            retrievedOrder.getItems().add(itemToAdd);
-            return Response.status(Response.Status.OK).entity("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    public Response getItemFromOrder(int orderId, int itemId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        if (Objects.nonNull(retrievedOrder)) {
-            final Optional<Item> retrievedItem = retrievedOrder.getItems().stream().filter(item -> item.getItemId() == itemId).findFirst();
-            if (retrievedItem.isEmpty()) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Item could not be found").type(MediaType.TEXT_PLAIN_TYPE).build();
-            }
-            return Response.status(Response.Status.OK).entity(retrievedItem.get()).type(MediaType.APPLICATION_JSON_TYPE).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order could not be found").type(MediaType.TEXT_PLAIN_TYPE).build();
-    }
-
-    public Response deleteItemFromOrder(int orderId, int itemId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        if (Objects.nonNull(retrievedOrder)) {
-            final List<Item> newItems = retrievedOrder.getItems().stream().filter(item -> !(item.getItemId() == itemId)).collect(Collectors.toList());
-            retrievedOrder.getItems().clear();
-            retrievedOrder.getItems().addAll(newItems);
+        final Item retrievedItem = entityManager.find(Item.class, itemId);
+        final boolean isItemAlreadyIncluded = retrievedOrder.getItems().stream().anyMatch(item -> item.getItemId() == itemId);
+        if (!isItemAlreadyIncluded) {
+            retrievedOrder.getItems().add(retrievedItem);
+            retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
             entityManager.flush();
-            return Response.status(Response.Status.OK).entity("Item was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return true;
         }
-        return Response.status(Response.Status.NOT_FOUND).entity("Order or Item were not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        return false;
+    }
+
+    public Item getItemFromOrder(int orderId, int itemId) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        return retrievedOrder.getItems().stream().filter(item -> item.getItemId() == itemId).findFirst().get();
+    }
+
+    public void deleteItemFromOrder(int orderId, int itemId) {
+        final Order retrievedOrder = retrieveOrder(orderId);
+        final Item itemToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getItemId() == itemId).findFirst().get();
+        retrievedOrder.getItems().remove(itemToBeDeleted);
+        retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
+        entityManager.flush();
     }
 
     private Order retrieveOrder(int orderId) {
         return entityManager.find(Order.class, orderId);
+    }
+
+    private double calculateTotal(List<Item> items) {
+        return items.stream().mapToDouble(item -> item.getQuantity() * item.getUnitPrice()).sum();
     }
 }

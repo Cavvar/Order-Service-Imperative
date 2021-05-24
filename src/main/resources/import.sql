@@ -27,10 +27,26 @@ INSERT INTO customers(customer_id, firstName, lastName, userName)
 VALUES (4, 'Alex', 'Schneider', 'AlexSchneider');
 -- Items
 INSERT INTO items(item_id, name, quantity, unitPrice)
-VALUES (1, 'Blue Sock', 5, 5.5);
+VALUES (1, 'Blue Sock', 4, 1.5);
 INSERT INTO items(item_id, name, quantity, unitPrice)
-VALUES (2, 'Red Sock', 3, 2.5);
+VALUES (2, 'Red Sock', 2, 2.5);
 INSERT INTO items(item_id, name, quantity, unitPrice)
 VALUES (3, 'Green Sock', 2, 9.5);
 INSERT INTO items(item_id, name, quantity, unitPrice)
-VALUES (4, 'Yellow Sock', 1, 0.5);
+VALUES (4, 'Yellow Sock', 2, 5.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (5, 'Ash Grey Sock', 8, 0.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (6, 'Black Sock', 10, 2.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (7, 'Orange Sock', 4, 1.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (8, 'Purple Sock', 2, 0.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (9, 'Lime Green Sock', 4, 5.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (10, 'Coral Pink Sock', 6, 2.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (11, 'Emerald Green Sock', 8, 9.5);
+INSERT INTO items(item_id, name, quantity, unitPrice)
+VALUES (12, 'Ice Blue Sock', 4, 0.5);

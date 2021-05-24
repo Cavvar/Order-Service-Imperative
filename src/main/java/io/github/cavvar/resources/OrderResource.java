@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Path("/orders")
@@ -59,7 +60,12 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response updateCardOfOrder(@PathParam("orderId") int orderId, Card newCard) {
-        return orderService.updateCardOfOrder(orderId, newCard);
+        try {
+            orderService.updateCardOfOrder(orderId, newCard);
+        } catch (NullPointerException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.OK).entity("Card Information was successfully updated").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @DELETE
@@ -67,30 +73,52 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response deleteOrder(@PathParam("orderId") int orderId) {
-        return orderService.deleteOrder(orderId);
+        try {
+            orderService.deleteOrder(orderId);
+        } catch (NullPointerException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.OK).entity("The order was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @GET
     @Path("{orderId}/items")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllItemsFromOrder(@PathParam("orderId") int orderId) {
-        return orderService.getAllItemsFromOrder(orderId);
+        try {
+            final List<Item> allItemsFromOrder = orderService.getAllItemsFromOrder(orderId);
+            return Response.status(Response.Status.OK).entity(allItemsFromOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
+        } catch (NullPointerException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
     }
 
     @POST
-    @Path("{orderId}/items")
+    @Path("{orderId}/items/{itemId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response addItemToOrder(@PathParam("orderId") int orderId, Item itemToAdd) {
-        return orderService.addItemToOrder(orderId, itemToAdd);
+    public Response addItemToOrder(@PathParam("orderId") int orderId, @PathParam("itemId") int itemId) {
+        try {
+            if (!orderService.addItemToOrder(orderId, itemId)) {
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
+        } catch (NullPointerException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.OK).entity("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @GET
     @Path("{orderId}/items/{itemId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getItemFromOrder(@PathParam("orderId") int orderId, @PathParam("itemId") int itemId) {
-        return orderService.getItemFromOrder(orderId, itemId);
+        try {
+            final Item itemFromOrder = orderService.getItemFromOrder(orderId, itemId);
+            return Response.status(Response.Status.OK).entity(itemFromOrder).type(MediaType.APPLICATION_JSON_TYPE).build();
+        } catch (NullPointerException | NoSuchElementException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order or Item could not be found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
     }
 
     @DELETE
@@ -98,6 +126,11 @@ public class OrderResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response deleteItemFromOrder(@PathParam("orderId") int orderId, @PathParam("itemId") int itemId) {
-        return orderService.deleteItemFromOrder(orderId, itemId);
+        try {
+            orderService.deleteItemFromOrder(orderId, itemId);
+        } catch (NullPointerException | NoSuchElementException ex) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Order or Item were not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        return Response.status(Response.Status.OK).entity("Item was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 }

@@ -127,6 +127,7 @@ paths:
                   $ref: '#/components/schemas/Item'
         '404':
           description: Not found. Order was not found
+  /orders/{orderId}/items/{itemId}:
     post:
       tags:
         - orders
@@ -139,18 +140,19 @@ paths:
           required: true
           schema:
             type: integer
-      requestBody:
-        description: Item to add to the order
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Item'
+        - name: itemId
+          in: path
+          description: Item ID
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: OK. A new item was added to the order
+        '204':
+          description: No content. Item already is included in the order
         '404':
           description: Not found. Order was not found
-  /orders/{orderId}/items/{itemId}:
     get:
       tags:
         - orders
