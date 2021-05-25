@@ -31,6 +31,10 @@ ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
     && microdnf update \
     && microdnf clean all \
+    && mkdir /agents \
+    && chown 1001 /agents \
+    && chmod "g+rwX" /agents \
+    && chown 1001:root /agents \
     && mkdir /deployments \
     && chown 1001 /deployments \
     && chmod "g+rwX" /deployments \
@@ -41,12 +45,17 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
     && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/conf/security/java.security
 
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
-ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_OPTIONS="-javaagent:/agents/opentelemetry-javaagent-all.jar \
+                  -Dotel.traces.exporter=jaeger \
+                  -Dotel.exporter.jager.endpoint=http://jaeger:14250 \
+                  -Dotel.resource.attributes=service.name=orders \
+                  -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 # We make four distinct layers so if there are application changes the library layers can be re-used
 COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
 COPY --chown=1001 target/quarkus-app/*.jar /deployments/
 COPY --chown=1001 target/quarkus-app/app/ /deployments/app/
 COPY --chown=1001 target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=1001 agents/opentelemetry-javaagent-all.jar /agents/
 
 EXPOSE 8080
 USER 1001

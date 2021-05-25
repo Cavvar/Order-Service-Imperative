@@ -6,10 +6,11 @@ services:
       dockerfile: src/main/docker/Dockerfile.jvm
     restart: always
     ports:
-    - 8080:8080
+      - 8080:8080
     container_name: orders
     depends_on:
       - orders-db
+      - jaeger
   orders-db:
     image: postgres
     restart: always
@@ -20,3 +21,14 @@ services:
       POSTGRES_DB: orders_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 16686:16686
+      - 5778:5778
+      - 14268:14268
+      - 14250:14250
+      - 9411:9411
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp

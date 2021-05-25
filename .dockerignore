@@ -1,4 +1,5 @@
 *
+!agents/opentelemetry-javaagent-all.jar
 !target/*-runner
 !target/*-runner.jar
 !target/lib/*
