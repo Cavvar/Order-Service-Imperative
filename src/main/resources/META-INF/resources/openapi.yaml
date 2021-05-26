@@ -149,8 +149,6 @@ paths:
       responses:
         '200':
           description: OK. A new item was added to the order
-        '204':
-          description: No content. Item is already included in the order
         '404':
           description: Not found. Order was not found
     get:

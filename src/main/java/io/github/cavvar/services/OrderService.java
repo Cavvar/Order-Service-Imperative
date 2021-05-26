@@ -1,13 +1,6 @@
 package io.github.cavvar.services;
 
-import io.github.cavvar.models.Address;
-import io.github.cavvar.models.Card;
-import io.github.cavvar.models.Customer;
-import io.github.cavvar.models.Item;
-import io.github.cavvar.models.NewOrder;
-import io.github.cavvar.models.Order;
-import io.github.cavvar.models.PaymentRequest;
-import io.github.cavvar.models.PaymentResponse;
+import io.github.cavvar.models.*;
 import io.github.cavvar.services.address.LiveAddressService;
 import io.github.cavvar.services.card.LiveCardService;
 import io.github.cavvar.services.customer.LiveCustomerService;
@@ -91,17 +84,12 @@ public class OrderService {
         return retrievedOrder.getItems();
     }
 
-    public boolean addItemToOrder(int orderId, int itemId) {
+    public void addItemToOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
         final Item retrievedItem = entityManager.find(Item.class, itemId);
-        final boolean isItemAlreadyIncluded = retrievedOrder.getItems().stream().anyMatch(item -> item.getItemId() == itemId);
-        if (!isItemAlreadyIncluded) {
-            retrievedOrder.getItems().add(retrievedItem);
-            retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
-            entityManager.flush();
-            return true;
-        }
-        return false;
+        retrievedOrder.getItems().add(retrievedItem);
+        retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
+        entityManager.flush();
     }
 
     public Item getItemFromOrder(int orderId, int itemId) {

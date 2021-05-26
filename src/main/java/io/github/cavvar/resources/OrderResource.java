@@ -108,9 +108,7 @@ public class OrderResource {
     @Transactional
     public Response addItemToOrder(@PathParam("orderId") int orderId, @PathParam("itemId") int itemId) {
         try {
-            if (!orderService.addItemToOrder(orderId, itemId)) {
-                return Response.status(Response.Status.NO_CONTENT).build();
-            }
+            orderService.addItemToOrder(orderId, itemId);
         } catch (NullPointerException ex) {
             return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
         }
