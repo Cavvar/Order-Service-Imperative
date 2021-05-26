@@ -13,9 +13,9 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OrderService {
@@ -100,8 +100,9 @@ public class OrderService {
 
     public void deleteItemFromOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        final Item itemToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst().get();
-        retrievedOrder.getItems().remove(itemToBeDeleted);
+        // Items with the same id will be deleted
+        final List<Item> itemsToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).collect(Collectors.toList());
+        retrievedOrder.getItems().removeAll(itemsToBeDeleted);
         retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
         entityManager.flush();
     }
