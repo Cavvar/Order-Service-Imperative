@@ -110,7 +110,7 @@ public class OrderResource {
         try {
             orderService.addItemToOrder(orderId, itemId);
         } catch (NullPointerException ex) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.NOT_FOUND).entity("Order or Item was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         return Response.status(Response.Status.OK).entity("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE).build();
     }

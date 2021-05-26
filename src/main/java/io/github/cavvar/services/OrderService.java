@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -94,12 +95,12 @@ public class OrderService {
 
     public Item getItemFromOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        return retrievedOrder.getItems().stream().filter(item -> item.getItemId() == itemId).findFirst().get();
+        return retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst().get();
     }
 
     public void deleteItemFromOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        final Item itemToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getItemId() == itemId).findFirst().get();
+        final Item itemToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst().get();
         retrievedOrder.getItems().remove(itemToBeDeleted);
         retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
         entityManager.flush();

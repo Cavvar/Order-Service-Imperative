@@ -17,7 +17,7 @@ public class Item {
     @Id
     @GeneratedValue
     @Column(name = "item_id")
-    private int itemId;
+    private int id;
     private String name;
     private int quantity;
     private double unitPrice;
