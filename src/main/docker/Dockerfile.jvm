@@ -47,7 +47,7 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-javaagent:/agents/opentelemetry-javaagent-all.jar \
                   -Dotel.traces.exporter=jaeger \
-                  -Dotel.exporter.jager.endpoint=http://jaeger:14250 \
+                  -Dotel.exporter.jaeger.endpoint=http://jaeger:14250 \
                   -Dotel.resource.attributes=service.name=orders \
                   -Dotel.metrics.exporter=none \
                   -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
