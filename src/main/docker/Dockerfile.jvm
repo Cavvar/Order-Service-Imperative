@@ -49,6 +49,7 @@ ENV JAVA_OPTIONS="-javaagent:/agents/opentelemetry-javaagent-all.jar \
                   -Dotel.traces.exporter=jaeger \
                   -Dotel.exporter.jager.endpoint=http://jaeger:14250 \
                   -Dotel.resource.attributes=service.name=orders \
+                  -Dotel.metrics.exporter=none \
                   -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 # We make four distinct layers so if there are application changes the library layers can be re-used
 COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
