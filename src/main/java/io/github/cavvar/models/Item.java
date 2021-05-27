@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 @Entity(name = "items")
 public class Item {
     @Id
-    @GeneratedValue
     @Column(name = "item_id")
     private int id;
     private String name;

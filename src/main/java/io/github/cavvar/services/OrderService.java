@@ -1,6 +1,13 @@
 package io.github.cavvar.services;
 
-import io.github.cavvar.models.*;
+import io.github.cavvar.models.Address;
+import io.github.cavvar.models.Card;
+import io.github.cavvar.models.Customer;
+import io.github.cavvar.models.Item;
+import io.github.cavvar.models.NewOrder;
+import io.github.cavvar.models.Order;
+import io.github.cavvar.models.PaymentRequest;
+import io.github.cavvar.models.PaymentResponse;
 import io.github.cavvar.services.address.LiveAddressService;
 import io.github.cavvar.services.card.LiveCardService;
 import io.github.cavvar.services.customer.LiveCustomerService;
@@ -13,9 +20,9 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OrderService {
@@ -87,8 +94,14 @@ public class OrderService {
 
     public void addItemToOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        final Item retrievedItem = entityManager.find(Item.class, itemId);
-        retrievedOrder.getItems().add(retrievedItem);
+        final Item retrievedItemFromDB = entityManager.find(Item.class, itemId);
+        final Optional<Item> optionalItem = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+        if (optionalItem.isPresent()) {
+            final Item existingItem = optionalItem.get();
+            existingItem.setQuantity(existingItem.getQuantity() + retrievedItemFromDB.getQuantity());
+        } else {
+            retrievedOrder.getItems().add(retrievedItemFromDB);
+        }
         retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
         entityManager.flush();
     }
@@ -100,9 +113,8 @@ public class OrderService {
 
     public void deleteItemFromOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
-        // Items with the same id will be deleted
-        final List<Item> itemsToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).collect(Collectors.toList());
-        retrievedOrder.getItems().removeAll(itemsToBeDeleted);
+        final Optional<Item> itemToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+        retrievedOrder.getItems().remove(itemToBeDeleted.get());
         retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
         entityManager.flush();
     }

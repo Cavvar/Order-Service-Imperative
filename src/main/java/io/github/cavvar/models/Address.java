@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Data
@@ -16,7 +14,6 @@ import javax.persistence.Id;
 @Entity(name = "addresses")
 public class Address {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "address_id")
     private int id;
     private String number;
