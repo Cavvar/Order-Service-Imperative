@@ -1,4 +1,4 @@
-package io.github.cavvar.utility;
+package io.github.cavvar.orderservice.utility;
 
 public final class Constants {
     public static final int TIMEOUT_VALUE = 5;

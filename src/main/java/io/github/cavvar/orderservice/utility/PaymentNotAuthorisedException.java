@@ -1,4 +1,4 @@
-package io.github.cavvar.utility;
+package io.github.cavvar.orderservice.utility;
 
 public class PaymentNotAuthorisedException extends Exception {
 }

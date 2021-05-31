@@ -1,4 +1,4 @@
-package io.github.cavvar.utility;
+package io.github.cavvar.orderservice.utility;
 
 import javax.ws.rs.client.InvocationCallback;
 
