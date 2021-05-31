@@ -130,6 +130,7 @@
                             <inputSpec>${project.basedir}/src/main/resources/META-INF/openapi.yaml</inputSpec>
                             <generatorName>jaxrs-spec</generatorName>
                             <generateApiTests>false</generateApiTests>
+                            <generateModels>false</generateModels>
                             <modelPackage>io.github.cavvar.orderservice.model</modelPackage>
                             <apiPackage>io.github.cavvar.orderservice.api</apiPackage>
                             <output>${project.basedir}/target</output>
@@ -137,6 +138,8 @@
                                 <sourceFolder>generated-sources/main/java</sourceFolder>
                                 <interfaceOnly>true</interfaceOnly>
                                 <dateLibrary>java8</dateLibrary>
+                                <returnResponse>true</returnResponse>
+                                <useBeanValidation>false</useBeanValidation>
                             </configOptions>
                         </configuration>
                     </execution>

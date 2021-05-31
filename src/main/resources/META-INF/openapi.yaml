@@ -5,7 +5,7 @@ info:
   description: An API providing basic ordering capabilities
 servers:
   - description: Local Order-Service API
-    url: https://localhost:8080
+    url: http://localhost:8080
 tags:
   - name: orders
     description: Available ordering operations
@@ -38,6 +38,10 @@ paths:
       responses:
         '200':
           description: OK. Order was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Invalid Input. The request payload contains invalid data
         '500':
