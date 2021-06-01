@@ -13,34 +13,16 @@
     <hashTree>
       <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Workload" enabled="true">
         <collectionProp name="Arguments.arguments">
-          <elementProp name="lowWorkload" elementType="Argument">
-            <stringProp name="Argument.name">lowWorkload</stringProp>
+          <elementProp name="workload" elementType="Argument">
+            <stringProp name="Argument.name">workload</stringProp>
             <stringProp name="Argument.value">100</stringProp>
             <stringProp name="Argument.desc">Low Workload</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="mediumWorkload" elementType="Argument">
-            <stringProp name="Argument.name">mediumWorkload</stringProp>
-            <stringProp name="Argument.value">400</stringProp>
-            <stringProp name="Argument.desc">Medium Workload</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="highWorkload" elementType="Argument">
-            <stringProp name="Argument.name">highWorkload</stringProp>
-            <stringProp name="Argument.value">700</stringProp>
-            <stringProp name="Argument.desc">High Workload</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="veryHighWorkload" elementType="Argument">
-            <stringProp name="Argument.name">veryHighWorkload</stringProp>
-            <stringProp name="Argument.value">1000</stringProp>
-            <stringProp name="Argument.desc">VeryHighWorkload</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
       </Arguments>
       <hashTree/>
-      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+      <ResultCollector guiclass="RespTimeGraphVisualizer" testclass="ResultCollector" testname="Response Time Graph" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -75,9 +57,10 @@
           </value>
         </objProp>
         <stringProp name="filename"></stringProp>
+        <stringProp name="RespTimeGraph.interval">100</stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -120,19 +103,19 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${lowWorkload}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID" enabled="true">
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID Group 1" enabled="true">
           <stringProp name="CounterConfig.start">1</stringProp>
-          <stringProp name="CounterConfig.end">500</stringProp>
+          <stringProp name="CounterConfig.end">${workload}</stringProp>
           <stringProp name="CounterConfig.incr">1</stringProp>
-          <stringProp name="CounterConfig.name">orderId</stringProp>
+          <stringProp name="CounterConfig.name">orderId1</stringProp>
           <stringProp name="CounterConfig.format"></stringProp>
           <boolProp name="CounterConfig.per_user">false</boolProp>
         </CounterConfig>
@@ -200,7 +183,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId1}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -243,7 +226,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId1}</stringProp>
           <stringProp name="HTTPSampler.method">PUT</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -282,7 +265,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId1}</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -371,19 +354,19 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${lowWorkload}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID" enabled="true">
-          <stringProp name="CounterConfig.start">501</stringProp>
-          <stringProp name="CounterConfig.end">1000</stringProp>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID Group 2" enabled="true">
+          <stringProp name="CounterConfig.start">${__intSum(${workload},1)}</stringProp>
+          <stringProp name="CounterConfig.end">${__intSum(${workload},${workload})}</stringProp>
           <stringProp name="CounterConfig.incr">1</stringProp>
-          <stringProp name="CounterConfig.name">orderId</stringProp>
+          <stringProp name="CounterConfig.name">orderId2</stringProp>
           <stringProp name="CounterConfig.format"></stringProp>
           <boolProp name="CounterConfig.per_user">false</boolProp>
         </CounterConfig>
@@ -451,7 +434,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -481,7 +464,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/2</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -511,7 +494,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/2</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -541,7 +524,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/10</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/10</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -571,7 +554,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -607,7 +590,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/10</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/10</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -637,7 +620,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/2</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -683,19 +666,19 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${lowWorkload}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID" enabled="true">
-          <stringProp name="CounterConfig.start">1001</stringProp>
-          <stringProp name="CounterConfig.end">1500</stringProp>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID Group 3" enabled="true">
+          <stringProp name="CounterConfig.start">${__intSum(${workload},${workload},1)}</stringProp>
+          <stringProp name="CounterConfig.end">${__intSum(${workload},${workload},${workload})}</stringProp>
           <stringProp name="CounterConfig.incr">1</stringProp>
-          <stringProp name="CounterConfig.name">orderId</stringProp>
+          <stringProp name="CounterConfig.name">orderId3</stringProp>
           <stringProp name="CounterConfig.format"></stringProp>
           <boolProp name="CounterConfig.per_user">false</boolProp>
         </CounterConfig>
@@ -960,7 +943,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/5</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId3}/items/5</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -990,7 +973,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/1337</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId3}/items/1337</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1020,7 +1003,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/1337</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId3}/items/1337</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
