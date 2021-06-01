@@ -61,7 +61,7 @@ public class OrdersApiImpl implements OrdersApi {
     public Response deleteOrder(Integer orderId) {
         try {
             orderService.deleteOrder(orderId);
-        } catch (NullPointerException ex) {
+        } catch (IllegalArgumentException | NullPointerException ex) {
             return Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         return Response.status(Response.Status.OK).entity("The order was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build();
