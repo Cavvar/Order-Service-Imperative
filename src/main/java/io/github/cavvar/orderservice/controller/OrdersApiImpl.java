@@ -6,6 +6,7 @@ import io.github.cavvar.orderservice.model.Item;
 import io.github.cavvar.orderservice.model.NewOrder;
 import io.github.cavvar.orderservice.model.Order;
 import io.github.cavvar.orderservice.service.OrderService;
+import io.smallrye.common.annotation.Blocking;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -22,6 +23,7 @@ public class OrdersApiImpl implements OrdersApi {
 
     @Override
     @Transactional
+    @Blocking
     public Response addItemToOrder(Integer orderId, Integer itemId) {
         try {
             orderService.addItemToOrder(orderId, itemId);
@@ -33,6 +35,7 @@ public class OrdersApiImpl implements OrdersApi {
 
     @Override
     @Transactional
+    @Blocking
     public Response createOrder(NewOrder newOrder) {
         if (newOrder.address == null || newOrder.customer == null || newOrder.card == null || newOrder.items == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Input").type(MediaType.TEXT_PLAIN_TYPE).build();
@@ -47,6 +50,7 @@ public class OrdersApiImpl implements OrdersApi {
 
     @Override
     @Transactional
+    @Blocking
     public Response deleteItemFromOrder(Integer orderId, Integer itemId) {
         try {
             orderService.deleteItemFromOrder(orderId, itemId);
@@ -58,6 +62,7 @@ public class OrdersApiImpl implements OrdersApi {
 
     @Override
     @Transactional
+    @Blocking
     public Response deleteOrder(Integer orderId) {
         try {
             orderService.deleteOrder(orderId);
@@ -68,6 +73,7 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
+    @Blocking
     public Response getAllItemsFromOrder(Integer orderId) {
         try {
             final List<Item> allItemsFromOrder = orderService.getAllItemsFromOrder(orderId);
@@ -78,12 +84,14 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
+    @Blocking
     public Response getAllOrders() {
         final List<Order> allOrders = orderService.getAllOrders();
         return Response.status(Response.Status.OK).entity(allOrders).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @Override
+    @Blocking
     public Response getItemFromOrder(Integer orderId, Integer itemId) {
         try {
             final Item itemFromOrder = orderService.getItemFromOrder(orderId, itemId);
@@ -94,6 +102,7 @@ public class OrdersApiImpl implements OrdersApi {
     }
 
     @Override
+    @Blocking
     public Response getOrder(Integer orderId) {
         final Order retrievedOrder = orderService.getOrder(orderId);
         if (Objects.isNull(retrievedOrder)) {
@@ -104,6 +113,7 @@ public class OrdersApiImpl implements OrdersApi {
 
     @Override
     @Transactional
+    @Blocking
     public Response updateCardOfOrder(Integer orderId, Card card) {
         try {
             orderService.updateCardOfOrder(orderId, card);
