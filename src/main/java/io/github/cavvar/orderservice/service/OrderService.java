@@ -14,6 +14,7 @@ import io.github.cavvar.orderservice.service.customer.LiveCustomerService;
 import io.github.cavvar.orderservice.service.item.LiveItemService;
 import io.github.cavvar.orderservice.service.payment.LivePaymentService;
 import io.github.cavvar.orderservice.utility.PaymentNotAuthorisedException;
+import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,8 +22,6 @@ import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 @ApplicationScoped
 public class OrderService {
@@ -45,82 +44,110 @@ public class OrderService {
     @Inject
     LivePaymentService paymentService;
 
-    public List<Order> getAllOrders() {
-        return entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
+    public Uni<List<Order>> getAllOrders() {
+        return Uni.createFrom().item(entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList());
     }
 
-    public Order postOrder(NewOrder newOrder) {
-        try {
-            // Retrieve newOrder data through hypermedia links
-            final Address address = addressService.getAddress(newOrder.address);
-            final Customer customer = customerService.getCustomer(newOrder.customer);
-            final Card card = cardService.getCard(newOrder.card);
-            final List<Item> items = itemService.getItems(newOrder.items);
-            // Calculate total sum to be paid
-            final double totalSum = calculateTotal(items);
-            // Call to Payment Service
-            final PaymentRequest paymentRequest = new PaymentRequest(address, card, customer, totalSum);
-            final PaymentResponse paymentResponse = paymentService.getPayment(paymentRequest);
-            if (!paymentResponse.isAuthorised()) {
-                throw new PaymentNotAuthorisedException();
-            }
-            final Order newCustomerOrder = new Order(customer, address, card, items, Calendar.getInstance().getTime(), totalSum);
-            entityManager.persist(newCustomerOrder);
-            return newCustomerOrder;
-        } catch (InterruptedException | ExecutionException | TimeoutException | PaymentNotAuthorisedException ex) {
-            throw new IllegalStateException(String.format("Unable to create order. %s", ex.getMessage()));
-        }
+    public Uni<Order> postOrder(NewOrder newOrder) {
+        final Uni<Address> addressUni = Uni.createFrom().future(addressService.getAddress(newOrder.address));
+        final Uni<Customer> customerUni = Uni.createFrom().future(customerService.getCustomer(newOrder.customer));
+        final Uni<Card> cardUni = Uni.createFrom().future(cardService.getCard(newOrder.card));
+        final Uni<List<Item>> itemsUni = Uni.createFrom().future(itemService.getItems(newOrder.items));
+        return Uni.combine().all().unis(addressUni, customerUni, cardUni, itemsUni).asTuple().onItem().transform(combinedObjects -> new Order(combinedObjects.getItem2(), combinedObjects.getItem1(), combinedObjects.getItem3(), combinedObjects.getItem4(), Calendar.getInstance().getTime(), calculateTotal(combinedObjects.getItem4()))).flatMap(order -> {
+            // Check if payment was authorised
+            final PaymentRequest paymentRequest = new PaymentRequest(order.getAddress(), order.getCard(), order.getCustomer(), order.getTotal());
+            final Uni<PaymentResponse> paymentResponseUni = Uni.createFrom().future(paymentService.getPayment(paymentRequest));
+            return paymentResponseUni.flatMap(paymentResponse -> {
+                if (!paymentResponse.isAuthorised()) {
+                    return Uni.createFrom().failure(new PaymentNotAuthorisedException());
+                }
+                return Uni.createFrom().item(order);
+            });
+        }).onItem().invoke(order -> entityManager.persist(order));
     }
 
-    public Order getOrder(int orderId) {
+    public Uni<Order> getOrder(int orderId) {
         return retrieveOrder(orderId);
     }
 
-    public void updateCardOfOrder(int orderId, Card newCard) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        retrievedOrder.setCard(newCard);
-        entityManager.flush();
+    public Uni<Boolean> updateCardOfOrder(int orderId, Card newCard) {
+        return retrieveOrder(orderId).map(order -> {
+            if (order != null) {
+                order.setCard(newCard);
+                entityManager.flush();
+                return true;
+            }
+            return false;
+        });
     }
 
-    public void deleteOrder(int orderId) {
-        final Order orderToBeDeleted = retrieveOrder(orderId);
-        entityManager.remove(orderToBeDeleted);
+    public Uni<Boolean> deleteOrder(int orderId) {
+        return retrieveOrder(orderId).map(order -> {
+            if (order != null) {
+                entityManager.remove(order);
+                return true;
+            }
+            return false;
+        });
     }
 
-    public List<Item> getAllItemsFromOrder(int orderId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        return retrievedOrder.getItems();
+    public Uni<List<Item>> getAllItemsFromOrder(int orderId) {
+        return retrieveOrder(orderId).map(order -> {
+            if (order != null) {
+                return order.getItems();
+            }
+            return null;
+        });
     }
 
-    public void addItemToOrder(int orderId, int itemId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        final Item retrievedItemFromDB = entityManager.find(Item.class, itemId);
-        final Optional<Item> optionalItem = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
-        if (optionalItem.isPresent()) {
-            final Item existingItem = optionalItem.get();
-            existingItem.setQuantity(existingItem.getQuantity() + retrievedItemFromDB.getQuantity());
-        } else {
-            retrievedOrder.getItems().add(retrievedItemFromDB);
-        }
-        retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
-        entityManager.flush();
+    public Uni<Boolean> addItemToOrder(int orderId, int itemId) {
+        return Uni.combine().all().unis(retrieveOrder(orderId), Uni.createFrom().item(entityManager.find(Item.class, itemId))).asTuple().map(combinedObjects -> {
+            if (combinedObjects.getItem1() != null && combinedObjects.getItem2() != null) {
+                final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+                if (itemFromList.isPresent()) {
+                    final Item itemFromOptional = itemFromList.get();
+                    itemFromOptional.setQuantity(itemFromOptional.getQuantity() + combinedObjects.getItem2().getQuantity());
+                } else {
+                    combinedObjects.getItem1().getItems().add(combinedObjects.getItem2());
+                }
+                combinedObjects.getItem1().setTotal(calculateTotal(combinedObjects.getItem1().getItems()));
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
-    public Item getItemFromOrder(int orderId, int itemId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        return retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst().get();
+    public Uni<Item> getItemFromOrder(int orderId, int itemId) {
+        return retrieveOrder(orderId).map(order -> {
+            if (order != null) {
+                final Optional<Item> optionalItem = order.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+                if (optionalItem.isPresent()) {
+                    return optionalItem.get();
+                }
+            }
+            return null;
+        });
     }
 
-    public void deleteItemFromOrder(int orderId, int itemId) {
-        final Order retrievedOrder = retrieveOrder(orderId);
-        final Optional<Item> itemToBeDeleted = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
-        retrievedOrder.getItems().remove(itemToBeDeleted.get());
-        retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
-        entityManager.flush();
+    public Uni<Boolean> deleteItemFromOrder(int orderId, int itemId) {
+        return retrieveOrder(orderId).map(order -> {
+            if (order != null) {
+                final Optional<Item> itemToBeDeleted = order.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+                if (itemToBeDeleted.isPresent()) {
+                    order.getItems().remove(itemToBeDeleted.get());
+                    order.setTotal(calculateTotal(order.getItems()));
+                    entityManager.flush();
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
-    private Order retrieveOrder(int orderId) {
-        return entityManager.find(Order.class, orderId);
+    private Uni<Order> retrieveOrder(int orderId) {
+        final Order retrievedOrder = entityManager.find(Order.class, orderId);
+        return Uni.createFrom().item(retrievedOrder);
     }
 
     private double calculateTotal(List<Item> items) {

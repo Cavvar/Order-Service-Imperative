@@ -119,36 +119,6 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <!-- RELEASE_VERSION -->
-                <version>5.1.0</version>
-                <!-- /RELEASE_VERSION -->
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/META-INF/openapi.yaml</inputSpec>
-                            <generatorName>jaxrs-spec</generatorName>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModels>false</generateModels>
-                            <modelPackage>io.github.cavvar.orderservice.model</modelPackage>
-                            <apiPackage>io.github.cavvar.orderservice.api</apiPackage>
-                            <output>${project.basedir}/target</output>
-                            <configOptions>
-                                <sourceFolder>generated-sources/main/java</sourceFolder>
-                                <interfaceOnly>true</interfaceOnly>
-                                <dateLibrary>java8</dateLibrary>
-                                <returnResponse>true</returnResponse>
-                                <useBeanValidation>false</useBeanValidation>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>

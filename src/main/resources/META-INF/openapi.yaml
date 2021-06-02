@@ -154,7 +154,7 @@ paths:
         '200':
           description: OK. A new item was added to the order
         '404':
-          description: Not found. Order was not found
+          description: Not found. Order or Item was not found
     get:
       tags:
         - orders
