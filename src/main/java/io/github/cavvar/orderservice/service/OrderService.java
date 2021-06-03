@@ -72,85 +72,60 @@ public class OrderService {
 
     public Uni<Boolean> updateCardOfOrder(int orderId, Card newCard) {
         return retrieveOrder(orderId).map(order -> {
-            if (order != null) {
-                order.setCard(newCard);
-                entityManager.flush();
-                return true;
-            }
-            return false;
-        });
+            order.setCard(newCard);
+            entityManager.flush();
+            return true;
+        }).onFailure().recoverWithItem(false);
     }
 
     public Uni<Boolean> deleteOrder(int orderId) {
         return retrieveOrder(orderId).map(order -> {
-            if (order != null) {
-                entityManager.remove(order);
-                return true;
-            }
-            return false;
-        });
+            entityManager.remove(order);
+            return true;
+        }).onFailure().recoverWithItem(false);
     }
 
     public Uni<List<Item>> getAllItemsFromOrder(int orderId) {
-        return retrieveOrder(orderId).map(order -> {
-            if (order != null) {
-                return order.getItems();
-            }
-            return null;
-        });
+        return retrieveOrder(orderId).map(Order::getItems).onFailure().recoverWithNull();
     }
 
     public Uni<Boolean> addItemToOrder(int orderId, int itemId) {
         return Uni.combine().all().unis(retrieveOrder(orderId), Uni.createFrom().item(entityManager.find(Item.class, itemId))).asTuple().map(combinedObjects -> {
-            if (combinedObjects.getItem1() != null && combinedObjects.getItem2() != null) {
-                final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
-                if (itemFromList.isPresent()) {
-                    final Item itemFromOptional = itemFromList.get();
-                    itemFromOptional.setQuantity(itemFromOptional.getQuantity() + combinedObjects.getItem2().getQuantity());
-                } else {
-                    combinedObjects.getItem1().getItems().add(combinedObjects.getItem2());
-                }
-                combinedObjects.getItem1().setTotal(calculateTotal(combinedObjects.getItem1().getItems()));
-                return true;
+            final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+            if (itemFromList.isPresent()) {
+                final Item itemFromOptional = itemFromList.get();
+                itemFromOptional.setQuantity(itemFromOptional.getQuantity() + combinedObjects.getItem2().getQuantity());
             } else {
-                return false;
+                combinedObjects.getItem1().getItems().add(combinedObjects.getItem2());
             }
-        });
+            combinedObjects.getItem1().setTotal(calculateTotal(combinedObjects.getItem1().getItems()));
+            return true;
+        }).onFailure().recoverWithItem(false);
     }
 
     public Uni<Item> getItemFromOrder(int orderId, int itemId) {
-        return retrieveOrder(orderId).map(order -> {
-            if (order != null) {
-                final Optional<Item> optionalItem = order.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
-                if (optionalItem.isPresent()) {
-                    return optionalItem.get();
-                }
-            }
-            return null;
-        });
+        return retrieveOrder(orderId).map(order -> getItemFromList(order.getItems(), itemId)).onFailure().recoverWithNull();
     }
 
     public Uni<Boolean> deleteItemFromOrder(int orderId, int itemId) {
         return retrieveOrder(orderId).map(order -> {
-            if (order != null) {
-                final Optional<Item> itemToBeDeleted = order.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
-                if (itemToBeDeleted.isPresent()) {
-                    order.getItems().remove(itemToBeDeleted.get());
-                    order.setTotal(calculateTotal(order.getItems()));
-                    entityManager.flush();
-                    return true;
-                }
-            }
-            return false;
-        });
+            final Item itemToBeDeleted = getItemFromList(order.getItems(), itemId);
+            order.getItems().remove(itemToBeDeleted);
+            order.setTotal(calculateTotal(order.getItems()));
+            entityManager.flush();
+            return true;
+        }).onFailure().recoverWithItem(false);
     }
 
     private Uni<Order> retrieveOrder(int orderId) {
-        final Order retrievedOrder = entityManager.find(Order.class, orderId);
-        return Uni.createFrom().item(retrievedOrder);
+        return Uni.createFrom().item(entityManager.find(Order.class, orderId));
     }
 
     private double calculateTotal(List<Item> items) {
         return items.stream().mapToDouble(item -> item.getQuantity() * item.getUnitPrice()).sum();
+    }
+
+    private Item getItemFromList(List<Item> items, int itemId) {
+        return items.stream().filter(item -> item.getId() == itemId).findFirst().get();
     }
 }
