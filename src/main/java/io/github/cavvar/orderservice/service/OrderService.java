@@ -15,10 +15,10 @@ import io.github.cavvar.orderservice.service.item.LiveItemService;
 import io.github.cavvar.orderservice.service.payment.LivePaymentService;
 import io.github.cavvar.orderservice.utility.PaymentNotAuthorisedException;
 import io.smallrye.mutiny.Uni;
+import org.hibernate.reactive.mutiny.Mutiny;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +27,7 @@ import java.util.Optional;
 public class OrderService {
 
     @Inject
-    EntityManager entityManager;
+    Mutiny.Session mutinySession;
 
     @Inject
     LiveAddressService addressService;
@@ -45,7 +45,7 @@ public class OrderService {
     LivePaymentService paymentService;
 
     public Uni<List<Order>> getAllOrders() {
-        return Uni.createFrom().item(entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList());
+        return mutinySession.createQuery("SELECT o FROM orders o", Order.class).getResultList();
     }
 
     public Uni<Order> postOrder(NewOrder newOrder) {
@@ -63,34 +63,27 @@ public class OrderService {
                 }
                 return Uni.createFrom().item(order);
             });
-        }).onItem().invoke(order -> entityManager.persist(order));
+        }).onItem().invoke(order -> mutinySession.persist(order));
     }
 
     public Uni<Order> getOrder(int orderId) {
         return retrieveOrder(orderId);
     }
 
-    public Uni<Boolean> updateCardOfOrder(int orderId, Card newCard) {
-        return retrieveOrder(orderId).map(order -> {
-            order.setCard(newCard);
-            entityManager.flush();
-            return true;
-        }).onFailure().recoverWithItem(false);
+    public Uni<Void> updateCardOfOrder(int orderId, Card newCard) {
+        return retrieveOrder(orderId).onItem().invoke(order -> order.setCard(newCard)).flatMap(order -> mutinySession.flush());
     }
 
-    public Uni<Boolean> deleteOrder(int orderId) {
-        return retrieveOrder(orderId).map(order -> {
-            entityManager.remove(order);
-            return true;
-        }).onFailure().recoverWithItem(false);
+    public Uni<Void> deleteOrder(int orderId) {
+        return retrieveOrder(orderId).flatMap(order -> mutinySession.remove(order));
     }
 
     public Uni<List<Item>> getAllItemsFromOrder(int orderId) {
-        return retrieveOrder(orderId).map(Order::getItems).onFailure().recoverWithNull();
+        return retrieveOrder(orderId).map(Order::getItems);
     }
 
     public Uni<Boolean> addItemToOrder(int orderId, int itemId) {
-        return Uni.combine().all().unis(retrieveOrder(orderId), Uni.createFrom().item(entityManager.find(Item.class, itemId))).asTuple().map(combinedObjects -> {
+        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().map(combinedObjects -> {
             final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
             if (itemFromList.isPresent()) {
                 final Item itemFromOptional = itemFromList.get();
@@ -104,21 +97,20 @@ public class OrderService {
     }
 
     public Uni<Item> getItemFromOrder(int orderId, int itemId) {
-        return retrieveOrder(orderId).map(order -> getItemFromList(order.getItems(), itemId)).onFailure().recoverWithNull();
+        return retrieveOrder(orderId).map(order -> getItemFromList(order.getItems(), itemId));
     }
 
-    public Uni<Boolean> deleteItemFromOrder(int orderId, int itemId) {
+    public Uni<Void> deleteItemFromOrder(int orderId, int itemId) {
         return retrieveOrder(orderId).map(order -> {
             final Item itemToBeDeleted = getItemFromList(order.getItems(), itemId);
             order.getItems().remove(itemToBeDeleted);
             order.setTotal(calculateTotal(order.getItems()));
-            entityManager.flush();
-            return true;
-        }).onFailure().recoverWithItem(false);
+            return itemToBeDeleted;
+        }).flatMap(item -> mutinySession.remove(item));
     }
 
     private Uni<Order> retrieveOrder(int orderId) {
-        return Uni.createFrom().item(entityManager.find(Order.class, orderId));
+        return mutinySession.find(Order.class, orderId);
     }
 
     private double calculateTotal(List<Item> items) {
