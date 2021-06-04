@@ -61,9 +61,9 @@ public class OrderService {
                 if (!paymentResponse.isAuthorised()) {
                     return Uni.createFrom().failure(new PaymentNotAuthorisedException());
                 }
-                return Uni.createFrom().item(order);
+                return mutinySession.persist(order).chain(mutinySession::flush).replaceWith(order);
             });
-        }).onItem().invoke(order -> mutinySession.persist(order));
+        });
     }
 
     public Uni<Order> getOrder(int orderId) {
