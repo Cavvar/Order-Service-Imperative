@@ -71,19 +71,19 @@ public class OrderService {
     }
 
     public Uni<Void> updateCardOfOrder(int orderId, Card newCard) {
-        return retrieveOrder(orderId).onItem().invoke(order -> order.setCard(newCard)).flatMap(order -> mutinySession.flush());
+        return retrieveOrder(orderId).onItem().invoke(order -> order.setCard(newCard)).chain(order -> mutinySession.flush());
     }
 
     public Uni<Void> deleteOrder(int orderId) {
-        return retrieveOrder(orderId).flatMap(order -> mutinySession.remove(order));
+        return retrieveOrder(orderId).flatMap(order -> mutinySession.remove(order).chain(mutinySession::flush));
     }
 
     public Uni<List<Item>> getAllItemsFromOrder(int orderId) {
         return retrieveOrder(orderId).map(Order::getItems);
     }
 
-    public Uni<Boolean> addItemToOrder(int orderId, int itemId) {
-        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().map(combinedObjects -> {
+    public Uni<Void> addItemToOrder(int orderId, int itemId) {
+        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().invoke(combinedObjects -> {
             final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
             if (itemFromList.isPresent()) {
                 final Item itemFromOptional = itemFromList.get();
@@ -92,8 +92,7 @@ public class OrderService {
                 combinedObjects.getItem1().getItems().add(combinedObjects.getItem2());
             }
             combinedObjects.getItem1().setTotal(calculateTotal(combinedObjects.getItem1().getItems()));
-            return true;
-        }).onFailure().recoverWithItem(false);
+        }).flatMap(unused -> mutinySession.flush());
     }
 
     public Uni<Item> getItemFromOrder(int orderId, int itemId) {
@@ -106,7 +105,7 @@ public class OrderService {
             order.getItems().remove(itemToBeDeleted);
             order.setTotal(calculateTotal(order.getItems()));
             return itemToBeDeleted;
-        }).flatMap(item -> mutinySession.remove(item));
+        }).flatMap(unused -> mutinySession.flush());
     }
 
     private Uni<Order> retrieveOrder(int orderId) {

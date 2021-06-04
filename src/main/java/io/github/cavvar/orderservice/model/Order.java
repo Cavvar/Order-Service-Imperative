@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,7 +34,7 @@ public class Order {
     @OneToOne
     @JoinColumn(name = "card_id")
     private Card card;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Item> items;
     private Date date;
     private double total;

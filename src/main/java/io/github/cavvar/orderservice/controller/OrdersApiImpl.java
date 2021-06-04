@@ -18,7 +18,9 @@ public class OrdersApiImpl implements OrdersApi {
     @Override
     @Transactional
     public Uni<Response> addItemToOrder(Integer orderId, Integer itemId) {
-        return orderService.addItemToOrder(orderId, itemId).onItem().transform(wasAdded -> wasAdded ? Response.ok("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE) : Response.status(Response.Status.NOT_FOUND).entity("Order or Item was not found").type(MediaType.TEXT_PLAIN_TYPE)).onItem().transform(Response.ResponseBuilder::build);
+        return orderService.addItemToOrder(orderId, itemId)
+                .onItem().transform(unused -> Response.ok("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE).build())
+                .onFailure().recoverWithItem(Response.status(Response.Status.NOT_FOUND).entity("Order or Item was not found").type(MediaType.TEXT_PLAIN_TYPE).build());
     }
 
     @Override
@@ -29,7 +31,7 @@ public class OrdersApiImpl implements OrdersApi {
         }
         return orderService.postOrder(newOrder)
                 .onItem().transform(order -> Response.ok(order).type(MediaType.APPLICATION_JSON_TYPE).build())
-                .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Server Error. Unable to create order").type(MediaType.TEXT_PLAIN_TYPE).build());
+                .onFailure().recoverWithItem(error -> Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Server Error. Unable to create order").type(MediaType.TEXT_PLAIN_TYPE).build());
     }
 
     @Override
@@ -70,8 +72,8 @@ public class OrdersApiImpl implements OrdersApi {
     @Override
     public Uni<Response> getOrder(Integer orderId) {
         return orderService.getOrder(orderId)
-                .onItem().transform(order -> Response.ok(order).type(MediaType.APPLICATION_JSON_TYPE).build())
-                .onFailure().recoverWithItem(Response.status(Response.Status.NOT_FOUND).entity("Order was not found").build());
+                .onItem().ifNotNull().transform(order -> Response.ok(order).type(MediaType.APPLICATION_JSON_TYPE).build())
+                .onItem().ifNull().continueWith(Response.status(Response.Status.NOT_FOUND).entity("Order was not found").build());
     }
 
     @Override
