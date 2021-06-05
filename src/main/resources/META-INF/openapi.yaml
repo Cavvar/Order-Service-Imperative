@@ -88,6 +88,10 @@ paths:
       responses:
         '200':
           description: Card Information was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
         '404':
           description: Order was not found
     delete:
@@ -103,7 +107,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        '204':
           description: The Order was successfully deleted
         '404':
           description: Order was not found
@@ -153,6 +157,10 @@ paths:
       responses:
         '200':
           description: A new item was added to the order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
         '404':
           description: Order or Item was not found
     get:
@@ -201,7 +209,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        '204':
           description: Item was successfully deleted
         '404':
           description: Order or Item were not found
