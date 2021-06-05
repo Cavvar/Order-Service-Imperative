@@ -76,10 +76,11 @@ public class OrderService {
         return retrieveOrder(orderId);
     }
 
-    public void updateCardOfOrder(int orderId, Card newCard) {
+    public Card updateCardOfOrder(int orderId, Card newCard) {
         final Order retrievedOrder = retrieveOrder(orderId);
         retrievedOrder.setCard(newCard);
         entityManager.flush();
+        return newCard;
     }
 
     public void deleteOrder(int orderId) {
@@ -92,18 +93,22 @@ public class OrderService {
         return retrievedOrder.getItems();
     }
 
-    public void addItemToOrder(int orderId, int itemId) {
+    public Item addItemToOrder(int orderId, int itemId) {
         final Order retrievedOrder = retrieveOrder(orderId);
         final Item retrievedItemFromDB = entityManager.find(Item.class, itemId);
         final Optional<Item> optionalItem = retrievedOrder.getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+        Item resultItem;
         if (optionalItem.isPresent()) {
             final Item existingItem = optionalItem.get();
             existingItem.setQuantity(existingItem.getQuantity() + retrievedItemFromDB.getQuantity());
+            resultItem = existingItem;
         } else {
             retrievedOrder.getItems().add(retrievedItemFromDB);
+            resultItem = retrievedItemFromDB;
         }
         retrievedOrder.setTotal(calculateTotal(retrievedOrder.getItems()));
         entityManager.flush();
+        return resultItem;
     }
 
     public Item getItemFromOrder(int orderId, int itemId) {
