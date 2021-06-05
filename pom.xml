@@ -138,7 +138,6 @@
                                 <sourceFolder>generated-sources/main/java</sourceFolder>
                                 <interfaceOnly>true</interfaceOnly>
                                 <dateLibrary>java8</dateLibrary>
-                                <returnResponse>true</returnResponse>
                                 <useBeanValidation>false</useBeanValidation>
                             </configOptions>
                         </configuration>
