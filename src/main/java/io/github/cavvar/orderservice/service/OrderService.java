@@ -13,7 +13,7 @@ import io.github.cavvar.orderservice.service.card.LiveCardService;
 import io.github.cavvar.orderservice.service.customer.LiveCustomerService;
 import io.github.cavvar.orderservice.service.item.LiveItemService;
 import io.github.cavvar.orderservice.service.payment.LivePaymentService;
-import io.github.cavvar.orderservice.utility.PaymentNotAuthorisedException;
+import io.github.cavvar.orderservice.utility.exceptions.PaymentNotAuthorisedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
