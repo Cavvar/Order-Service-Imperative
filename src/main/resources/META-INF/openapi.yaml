@@ -18,7 +18,7 @@ paths:
       operationId: getAllOrders
       responses:
         '200':
-          description: OK. Collection of orders
+          description: Collection of orders
           content:
             application/json:
               schema:
@@ -37,15 +37,15 @@ paths:
               $ref: '#/components/schemas/NewOrder'
       responses:
         '200':
-          description: OK. Order was successfully created
+          description: Order was successfully created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '400':
-          description: Invalid Input. The request payload contains invalid data
+          description: The request payload contains invalid data
         '500':
-          description: Internal Server Error. Unable to create order
+          description: Unable to create order
   /orders/{orderId}:
     get:
       tags:
@@ -61,13 +61,13 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK. Order Details were successfully returned
+          description: Order Details were successfully returned
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '404':
-          description: Not found. Order was not found
+          description: Order was not found
     put:
       tags:
         - orders
@@ -87,9 +87,13 @@ paths:
               $ref: '#/components/schemas/Card'
       responses:
         '200':
-          description: OK. Card Information was successfully updated
+          description: Card Information was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
         '404':
-          description: Not found. Order was not found
+          description: Order was not found
     delete:
       tags:
         - orders
@@ -103,8 +107,8 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
-          description: OK. The Order was successfully deleted
+        '204':
+          description: The Order was successfully deleted
         '404':
           description: Order was not found
   /orders/{orderId}/items:
@@ -122,7 +126,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK. Collection of items from an order
+          description: Collection of items from an order
           content:
             application/json:
               schema:
@@ -130,7 +134,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Item'
         '404':
-          description: Not found. Order was not found
+          description: Order was not found
   /orders/{orderId}/items/{itemId}:
     post:
       tags:
@@ -152,9 +156,13 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK. A new item was added to the order
+          description: A new item was added to the order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
         '404':
-          description: Not found. Order was not found
+          description: Order or Item was not found
     get:
       tags:
         - orders
@@ -175,13 +183,13 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK. Retrieved item was returned
+          description: Retrieved item was returned
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Item'
         '404':
-          description: Not found. Order or Item were not found
+          description: Order or Item were not found
     delete:
       tags:
         - orders
@@ -201,10 +209,10 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
-          description: OK. Item was successfully deleted
+        '204':
+          description: Item was successfully deleted
         '404':
-          description: Not found. Order or Item were not found
+          description: Order or Item were not found
 components:
   schemas:
     Order:
