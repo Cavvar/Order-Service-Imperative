@@ -4,13 +4,23 @@
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Order Service Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
     </TestPlan>
     <hashTree>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random Number 1 to 12" enabled="true">
+        <stringProp name="maximumValue">12</stringProp>
+        <stringProp name="minimumValue">1</stringProp>
+        <stringProp name="outputFormat"></stringProp>
+        <boolProp name="perThread">false</boolProp>
+        <stringProp name="randomSeed"></stringProp>
+        <stringProp name="variableName">RAND_NUMB_ONE_TO_TWELVE</stringProp>
+      </RandomVariableConfig>
+      <hashTree/>
       <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Workload" enabled="true">
         <collectionProp name="Arguments.arguments">
           <elementProp name="workload" elementType="Argument">
@@ -96,29 +106,8 @@
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Test Group 1" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-      </ThreadGroup>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Create Order Fragment" enabled="true"/>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID Group 1" enabled="true">
-          <stringProp name="CounterConfig.start">1</stringProp>
-          <stringProp name="CounterConfig.end">${workload}</stringProp>
-          <stringProp name="CounterConfig.incr">1</stringProp>
-          <stringProp name="CounterConfig.name">orderId1</stringProp>
-          <stringProp name="CounterConfig.format"></stringProp>
-          <boolProp name="CounterConfig.per_user">false</boolProp>
-        </CounterConfig>
-        <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Order" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -173,7 +162,17 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Order ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">orderId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">OrderID_NOT_FOUND</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
         </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Get All Orders Fragment" enabled="true"/>
+      <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Order" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
@@ -182,7 +181,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId1}</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -204,6 +203,75 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Get Order Fragment" enabled="true"/>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Order" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion Get Order" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Delete Order Fragment" enabled="true"/>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Order" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}</stringProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion Delete Order" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49590">204</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Update Card Fragment" enabled="true"/>
+      <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Update Card" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -225,7 +293,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId1}</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}</stringProp>
           <stringProp name="HTTPSampler.method">PUT</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -256,7 +324,10 @@
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Order" enabled="true">
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Get Item Fragment" enabled="true"/>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Item" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -264,37 +335,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId1}</stringProp>
-          <stringProp name="HTTPSampler.method">DELETE</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion Delete Order" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="49586">200</stringProp>
-            </collectionProp>
-            <stringProp name="Assertion.custom_message"></stringProp>
-            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-            <boolProp name="Assertion.assume_success">false</boolProp>
-            <intProp name="Assertion.test_type">8</intProp>
-          </ResponseAssertion>
-          <hashTree/>
-        </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Order Failure" enabled="true">
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-            <collectionProp name="Arguments.arguments"/>
-          </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8080</stringProp>
-          <stringProp name="HTTPSampler.protocol"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/0</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -305,7 +346,171 @@
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion Get Order Failure" enabled="true">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Get Items Fragment" enabled="true"/>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Items" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Delete Item Fragment" enabled="true"/>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Item" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49590">204</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Add Item To Order Fragment" enabled="true"/>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Item To Order" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">8</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Unit Test Replacement Fragment 1" enabled="true"/>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Get Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1697177932">Get Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update Card" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1563449961">Update Card Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Delete Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1879403031">Delete Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Order Failure" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/orders/0</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="51512">404</stringProp>
             </collectionProp>
@@ -326,7 +531,7 @@
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/orders/0</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
@@ -335,7 +540,7 @@
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion Delete Order Failure" enabled="true">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="51512">404</stringProp>
             </collectionProp>
@@ -347,29 +552,8 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Test Group 2" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-      </ThreadGroup>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Unit Test Replacement Fragment 2" enabled="true"/>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID Group 2" enabled="true">
-          <stringProp name="CounterConfig.start">${__intSum(${workload},1)}</stringProp>
-          <stringProp name="CounterConfig.end">${__intSum(${workload},${workload})}</stringProp>
-          <stringProp name="CounterConfig.incr">1</stringProp>
-          <stringProp name="CounterConfig.name">orderId2</stringProp>
-          <stringProp name="CounterConfig.format"></stringProp>
-          <boolProp name="CounterConfig.per_user">false</boolProp>
-        </CounterConfig>
-        <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Order" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -424,6 +608,13 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Order ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">orderId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">OrderID_NOT_FOUND</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Items" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -433,7 +624,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -463,7 +654,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -493,7 +684,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -506,7 +697,7 @@
         <hashTree>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
             <collectionProp name="Asserion.test_strings">
-              <stringProp name="49586">200</stringProp>
+              <stringProp name="49590">204</stringProp>
             </collectionProp>
             <stringProp name="Assertion.custom_message"></stringProp>
             <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
@@ -523,7 +714,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/10</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/10</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -553,7 +744,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -589,7 +780,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/10</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/10</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -619,7 +810,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId2}/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/2</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -641,7 +832,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="${items_matchNr}" enabled="true">
+        <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="${items_matchNr}" enabled="false">
           <boolProp name="displayJMeterProperties">false</boolProp>
           <boolProp name="displayJMeterVariables">true</boolProp>
           <boolProp name="displaySystemProperties">false</boolProp>
@@ -659,37 +850,16 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Test Group 3" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-      </ThreadGroup>
+      <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Unit Test Replacement Fragment 3" enabled="true"/>
       <hashTree>
-        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Order ID Group 3" enabled="true">
-          <stringProp name="CounterConfig.start">${__intSum(${workload},${workload},1)}</stringProp>
-          <stringProp name="CounterConfig.end">${__intSum(${workload},${workload},${workload})}</stringProp>
-          <stringProp name="CounterConfig.incr">1</stringProp>
-          <stringProp name="CounterConfig.name">orderId3</stringProp>
-          <stringProp name="CounterConfig.format"></stringProp>
-          <boolProp name="CounterConfig.per_user">false</boolProp>
-        </CounterConfig>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Order Failure" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Order Failure" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-    &quot;customer&quot;: &quot;http://taHyBpOzYrZCZgtHAy.moTAsNnLXAWeZJbFHeqaFzBI5PdGe+8YlI4x-7&quot;,&#xd;
+    &quot;customer&quot;: &quot;https://SpyPwoFCPUUcHxJEU.dnEbWMDxwMSD+6XwKHjOP7ba1cRO7hDw&quot;,&#xd;
     &quot;address&quot;: &quot;http://taHyBpOzYrZCZgtHAy.moTAsNnLXAWeZJbFHeqaFzBI5PdGe+8YlI4x-7&quot;,&#xd;
     &quot;card&quot;: &quot;http://boWc.yooLBOICW,IVX1ow9KVTw1KccVwtOobhbiK7G39KbzmwOGopkYH5xv&quot;,&#xd;
     &quot;items&quot;: null&#xd;
@@ -737,7 +907,7 @@
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Items Failure" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Items Failure" enabled="false">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -745,7 +915,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/1337/items</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/0/items</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -767,7 +937,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Item To Order Failure 1" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Item To Order Failure 1" enabled="false">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -775,9 +945,9 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/1337/items/10</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/0/items/10</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
@@ -797,7 +967,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Update Card Failure" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Update Card Failure" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -808,8 +978,7 @@
 	&quot;longNum&quot;: &quot;1234-5678-9012-3456&quot;,&#xd;
 	&quot;expires&quot;: &quot;01/99&quot;,&#xd;
 	&quot;ccv&quot;: &quot;123&quot;&#xd;
-}&#xd;
-</stringProp>
+}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -818,7 +987,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/1337</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/0</stringProp>
           <stringProp name="HTTPSampler.method">PUT</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -849,7 +1018,7 @@
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Item Failure 1" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Item Failure 1" enabled="false">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -857,7 +1026,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/1337/items/2</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/0/items/2</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -879,7 +1048,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Order" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Order" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -933,8 +1102,15 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract Order ID" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">orderId</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">OrderID_NOT_FOUND</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Item Failure" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Item To Order Failure 2" enabled="false">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -942,9 +1118,9 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId3}/items/5</stringProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/13</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
@@ -964,7 +1140,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Item Failure 2" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Item Failure 2" enabled="false">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -972,7 +1148,7 @@
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId3}/items/1337</stringProp>
+          <stringProp name="HTTPSampler.path">/orders/${orderId}/items/13</stringProp>
           <stringProp name="HTTPSampler.method">DELETE</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -994,36 +1170,289 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Add Item To Order Failure 2" enabled="true">
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-            <collectionProp name="Arguments.arguments"/>
-          </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8080</stringProp>
-          <stringProp name="HTTPSampler.protocol"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/orders/${orderId3}/items/1337</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        </HTTPSamplerProxy>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Unit Test Replacement Group" enabled="false">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${workload}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Unit Test Fragment 1" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="-1340479455">Unit Test Replacement Fragment 1</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Unit Test Fragment 2" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="-1340479454">Unit Test Replacement Fragment 2</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Unit Test Fragment 3" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="-1340479453">Unit Test Replacement Fragment 3</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create Order Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+        <stringProp name="Unit">M</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create &amp; Get Order Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="Unit">M</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Get Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1697177932">Get Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create &amp; Delete Order Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="Unit">M</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Delete Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1879403031">Delete Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create Order  &amp; Add Items Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+        <stringProp name="Unit">M</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <stringProp name="LoopController.loops">${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
+        </LoopController>
         <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
-            <collectionProp name="Asserion.test_strings">
-              <stringProp name="51512">404</stringProp>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Add Item" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-879981126">Order Service Test Plan</stringProp>
+              <stringProp name="-2021643751">Add Item To Order Fragment</stringProp>
             </collectionProp>
-            <stringProp name="Assertion.custom_message"></stringProp>
-            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-            <boolProp name="Assertion.assume_success">true</boolProp>
-            <intProp name="Assertion.test_type">8</intProp>
-          </ResponseAssertion>
+          </ModuleController>
           <hashTree/>
         </hashTree>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create Order &amp; Update Card Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="Unit">M</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Update Card" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1563449961">Update Card Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create Order  &amp; Add Items  &amp; Delete Item Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+        <stringProp name="Unit">M</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <stringProp name="LoopController.loops">${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
+        </LoopController>
+        <hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Add Item" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-879981126">Order Service Test Plan</stringProp>
+              <stringProp name="-2021643751">Add Item To Order Fragment</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree/>
+        </hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Delete Item" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="-1131493592">Delete Item Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Create Order  &amp; Add Items &amp; Get Items &amp; Get Item Arrival Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">5</stringProp>
+        <stringProp name="Steps">5</stringProp>
+        <stringProp name="Hold">60</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations">1000</stringProp>
+        <stringProp name="ConcurrencyLimit">15</stringProp>
+        <stringProp name="Unit">M</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="1957962406">Create Order Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <stringProp name="LoopController.loops">${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
+        </LoopController>
+        <hashTree>
+          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Add Item" enabled="true">
+            <collectionProp name="ModuleController.node_path">
+              <stringProp name="764597751">Test Plan</stringProp>
+              <stringProp name="-879981126">Order Service Test Plan</stringProp>
+              <stringProp name="-2021643751">Add Item To Order Fragment</stringProp>
+            </collectionProp>
+          </ModuleController>
+          <hashTree/>
+        </hashTree>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Get Items" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="-1709383398">Get Items Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Get Item" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="-879981126">Order Service Test Plan</stringProp>
+            <stringProp name="-1137371821">Get Item Fragment</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
       </hashTree>
     </hashTree>
   </hashTree>
