@@ -70,8 +70,8 @@ public class OrderService {
         return retrieveOrder(orderId);
     }
 
-    public Uni<Void> updateCardOfOrder(int orderId, Card newCard) {
-        return retrieveOrder(orderId).onItem().invoke(order -> order.setCard(newCard)).chain(order -> mutinySession.flush());
+    public Uni<Card> updateCardOfOrder(int orderId, Card newCard) {
+        return retrieveOrder(orderId).onItem().invoke(order -> order.setCard(newCard)).chain(mutinySession::flush).replaceWith(newCard);
     }
 
     public Uni<Void> deleteOrder(int orderId) {
@@ -82,17 +82,21 @@ public class OrderService {
         return retrieveOrder(orderId).map(Order::getItems);
     }
 
-    public Uni<Void> addItemToOrder(int orderId, int itemId) {
-        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().invoke(combinedObjects -> {
+    public Uni<Item> addItemToOrder(int orderId, int itemId) {
+        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().map(combinedObjects -> {
             final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+            Item resultItem;
             if (itemFromList.isPresent()) {
                 final Item itemFromOptional = itemFromList.get();
                 itemFromOptional.setQuantity(itemFromOptional.getQuantity() + combinedObjects.getItem2().getQuantity());
+                resultItem = itemFromOptional;
             } else {
                 combinedObjects.getItem1().getItems().add(combinedObjects.getItem2());
+                resultItem = combinedObjects.getItem2();
             }
             combinedObjects.getItem1().setTotal(calculateTotal(combinedObjects.getItem1().getItems()));
-        }).flatMap(unused -> mutinySession.flush());
+            return resultItem;
+        }).flatMap(item -> mutinySession.flush().replaceWith(item));
     }
 
     public Uni<Item> getItemFromOrder(int orderId, int itemId) {
@@ -105,7 +109,7 @@ public class OrderService {
             order.getItems().remove(itemToBeDeleted);
             order.setTotal(calculateTotal(order.getItems()));
             return itemToBeDeleted;
-        }).flatMap(unused -> mutinySession.flush());
+        }).chain(mutinySession::flush);
     }
 
     private Uni<Order> retrieveOrder(int orderId) {

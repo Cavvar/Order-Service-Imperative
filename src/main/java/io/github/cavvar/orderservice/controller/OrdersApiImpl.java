@@ -19,7 +19,7 @@ public class OrdersApiImpl implements OrdersApi {
     @Transactional
     public Uni<Response> addItemToOrder(Integer orderId, Integer itemId) {
         return orderService.addItemToOrder(orderId, itemId)
-                .onItem().transform(unused -> Response.ok("A new item was added to the order").type(MediaType.TEXT_PLAIN_TYPE).build())
+                .onItem().transform(item -> Response.ok(item).type(MediaType.APPLICATION_JSON_TYPE).build())
                 .onFailure().recoverWithItem(Response.status(Response.Status.NOT_FOUND).entity("Order or Item was not found").type(MediaType.TEXT_PLAIN_TYPE).build());
     }
 
@@ -38,7 +38,7 @@ public class OrdersApiImpl implements OrdersApi {
     @Transactional
     public Uni<Response> deleteItemFromOrder(Integer orderId, Integer itemId) {
         return orderService.deleteItemFromOrder(orderId, itemId)
-                .onItem().transform(unused -> Response.ok("Item was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build())
+                .onItem().transform(unused -> Response.noContent().build())
                 .onFailure().recoverWithItem(Response.status(Response.Status.NOT_FOUND).entity("Order or Item were not found").type(MediaType.TEXT_PLAIN_TYPE).build());
     }
 
@@ -46,7 +46,7 @@ public class OrdersApiImpl implements OrdersApi {
     @Transactional
     public Uni<Response> deleteOrder(Integer orderId) {
         return orderService.deleteOrder(orderId)
-                .onItem().transform(unused -> Response.ok("The order was successfully deleted").type(MediaType.TEXT_PLAIN_TYPE).build())
+                .onItem().transform(unused -> Response.noContent().build())
                 .onFailure().recoverWithItem(Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build());
     }
 
@@ -80,7 +80,7 @@ public class OrdersApiImpl implements OrdersApi {
     @Transactional
     public Uni<Response> updateCardOfOrder(Integer orderId, Card card) {
         return orderService.updateCardOfOrder(orderId, card)
-                .onItem().transform(unused -> Response.ok("Card Information was successfully updated").type(MediaType.TEXT_PLAIN_TYPE).build())
+                .onItem().transform(newCard -> Response.ok(newCard).type(MediaType.APPLICATION_JSON_TYPE).build())
                 .onFailure().recoverWithItem(Response.status(Response.Status.NOT_FOUND).entity("Order was not found").type(MediaType.TEXT_PLAIN_TYPE).build());
     }
 }
