@@ -20,9 +20,11 @@ spec:
       labels:
         name: orders
     spec:
+      restartPolicy: Always
       containers:
         - name: orders
-          image: src/main/docker/Dockerfile.jvm
+          image: lilty/cavvar:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---
@@ -80,7 +82,7 @@ metadata:
   namespace: order-service
 spec:
   ports:
-    - port: 5433
+    - port: 5432
       targetPort: 5432
   selector:
     name: orders-db
