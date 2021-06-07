@@ -1210,33 +1210,10 @@
         </ModuleController>
         <hashTree/>
       </hashTree>
-      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Order Creation" enabled="false">
-        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
-        <stringProp name="RampUp">5</stringProp>
-        <stringProp name="Steps">5</stringProp>
-        <stringProp name="Hold">60</stringProp>
-        <stringProp name="LogFilename"></stringProp>
-        <stringProp name="Iterations">1000</stringProp>
-        <stringProp name="ConcurrencyLimit">15</stringProp>
-        <stringProp name="Unit">M</stringProp>
-        <stringProp name="TestPlan.comments">The user creates multiple orders</stringProp>
-      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
-      <hashTree>
-        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
-          <collectionProp name="ModuleController.node_path">
-            <stringProp name="764597751">Test Plan</stringProp>
-            <stringProp name="-879981126">Order Service Test Plan</stringProp>
-            <stringProp name="1957962406">Create Order Fragment</stringProp>
-          </collectionProp>
-        </ModuleController>
-        <hashTree/>
-      </hashTree>
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Online Shop Order" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="TargetLevel">732</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1267,7 +1244,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Rescinding Orders" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="TargetLevel">732</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1298,7 +1275,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Changing Payment Informationen" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="TargetLevel">732</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1329,7 +1306,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Order Creation With Multiple Items" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="TargetLevel">732</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1366,7 +1343,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Order Creation With Unwanted Items" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="TargetLevel">732</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1404,59 +1381,6 @@
             <stringProp name="764597751">Test Plan</stringProp>
             <stringProp name="-879981126">Order Service Test Plan</stringProp>
             <stringProp name="-1131493592">Delete Item Fragment</stringProp>
-          </collectionProp>
-        </ModuleController>
-        <hashTree/>
-      </hashTree>
-      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Order Creation And Inspection Of A Single Item" enabled="false">
-        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">100</stringProp>
-        <stringProp name="RampUp">5</stringProp>
-        <stringProp name="Steps">5</stringProp>
-        <stringProp name="Hold">60</stringProp>
-        <stringProp name="LogFilename"></stringProp>
-        <stringProp name="Iterations">1000</stringProp>
-        <stringProp name="ConcurrencyLimit">15</stringProp>
-        <stringProp name="Unit">M</stringProp>
-        <stringProp name="TestPlan.comments">The user has created an order with multiple items. After that he checks the list of items to maybe reorder one item again</stringProp>
-      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
-      <hashTree>
-        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Create Order" enabled="true">
-          <collectionProp name="ModuleController.node_path">
-            <stringProp name="764597751">Test Plan</stringProp>
-            <stringProp name="-879981126">Order Service Test Plan</stringProp>
-            <stringProp name="1957962406">Create Order Fragment</stringProp>
-          </collectionProp>
-        </ModuleController>
-        <hashTree/>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">true</boolProp>
-          <stringProp name="LoopController.loops">${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
-        </LoopController>
-        <hashTree>
-          <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Add Item" enabled="true">
-            <collectionProp name="ModuleController.node_path">
-              <stringProp name="764597751">Test Plan</stringProp>
-              <stringProp name="-879981126">Order Service Test Plan</stringProp>
-              <stringProp name="-2021643751">Add Item To Order Fragment</stringProp>
-            </collectionProp>
-          </ModuleController>
-          <hashTree/>
-        </hashTree>
-        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Get Items" enabled="true">
-          <collectionProp name="ModuleController.node_path">
-            <stringProp name="764597751">Test Plan</stringProp>
-            <stringProp name="-879981126">Order Service Test Plan</stringProp>
-            <stringProp name="-1709383398">Get Items Fragment</stringProp>
-          </collectionProp>
-        </ModuleController>
-        <hashTree/>
-        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Get Item" enabled="true">
-          <collectionProp name="ModuleController.node_path">
-            <stringProp name="764597751">Test Plan</stringProp>
-            <stringProp name="-879981126">Order Service Test Plan</stringProp>
-            <stringProp name="-1137371821">Get Item Fragment</stringProp>
           </collectionProp>
         </ModuleController>
         <hashTree/>
