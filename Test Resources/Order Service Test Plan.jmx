@@ -1213,7 +1213,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Online Shop Order" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">732</stringProp>
+        <stringProp name="TargetLevel">300</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1244,7 +1244,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Rescinding Orders" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">732</stringProp>
+        <stringProp name="TargetLevel">50</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1275,7 +1275,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Changing Payment Informationen" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">732</stringProp>
+        <stringProp name="TargetLevel">50</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1306,7 +1306,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Order Creation With Multiple Items" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">732</stringProp>
+        <stringProp name="TargetLevel">25</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1327,7 +1327,7 @@
         <hashTree/>
         <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">true</boolProp>
-          <stringProp name="LoopController.loops">${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </LoopController>
         <hashTree>
           <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Add Item" enabled="true">
@@ -1343,7 +1343,7 @@
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Order Creation With Unwanted Items" enabled="false">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">732</stringProp>
+        <stringProp name="TargetLevel">20</stringProp>
         <stringProp name="RampUp">5</stringProp>
         <stringProp name="Steps">5</stringProp>
         <stringProp name="Hold">60</stringProp>
@@ -1364,7 +1364,7 @@
         <hashTree/>
         <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">true</boolProp>
-          <stringProp name="LoopController.loops">${RAND_NUMB_ONE_TO_TWELVE}</stringProp>
+          <stringProp name="LoopController.loops">3</stringProp>
         </LoopController>
         <hashTree>
           <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Add Item" enabled="true">
