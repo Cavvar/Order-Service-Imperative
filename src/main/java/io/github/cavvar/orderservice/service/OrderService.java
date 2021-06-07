@@ -53,7 +53,7 @@ public class OrderService {
         final Uni<Customer> customerUni = Uni.createFrom().future(customerService.getCustomer(newOrder.customer));
         final Uni<Card> cardUni = Uni.createFrom().future(cardService.getCard(newOrder.card));
         final Uni<List<Item>> itemsUni = Uni.createFrom().future(itemService.getItems(newOrder.items));
-        return Uni.combine().all().unis(addressUni, customerUni, cardUni, itemsUni).asTuple().onItem().transform(combinedObjects -> new Order(combinedObjects.getItem2(), combinedObjects.getItem1(), combinedObjects.getItem3(), combinedObjects.getItem4(), Calendar.getInstance().getTime(), calculateTotal(combinedObjects.getItem4()))).flatMap(order -> {
+        return Uni.combine().all().unis(addressUni, customerUni, cardUni, itemsUni).asTuple().onItem().transform(tuple -> new Order(tuple.getItem2(), tuple.getItem1(), tuple.getItem3(), tuple.getItem4(), Calendar.getInstance().getTime(), calculateTotal(tuple.getItem4()))).flatMap(order -> {
             // Check if payment was authorised
             final PaymentRequest paymentRequest = new PaymentRequest(order.getAddress(), order.getCard(), order.getCustomer(), order.getTotal());
             final Uni<PaymentResponse> paymentResponseUni = Uni.createFrom().future(paymentService.getPayment(paymentRequest));
@@ -83,18 +83,18 @@ public class OrderService {
     }
 
     public Uni<Item> addItemToOrder(int orderId, int itemId) {
-        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().map(combinedObjects -> {
-            final Optional<Item> itemFromList = combinedObjects.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
+        return Uni.combine().all().unis(retrieveOrder(orderId), mutinySession.find(Item.class, itemId)).asTuple().map(tuple -> {
+            final Optional<Item> itemFromList = tuple.getItem1().getItems().stream().filter(item -> item.getId() == itemId).findFirst();
             Item resultItem;
             if (itemFromList.isPresent()) {
                 final Item itemFromOptional = itemFromList.get();
-                itemFromOptional.setQuantity(itemFromOptional.getQuantity() + combinedObjects.getItem2().getQuantity());
+                itemFromOptional.setQuantity(itemFromOptional.getQuantity() + tuple.getItem2().getQuantity());
                 resultItem = itemFromOptional;
             } else {
-                combinedObjects.getItem1().getItems().add(combinedObjects.getItem2());
-                resultItem = combinedObjects.getItem2();
+                tuple.getItem1().getItems().add(tuple.getItem2());
+                resultItem = tuple.getItem2();
             }
-            combinedObjects.getItem1().setTotal(calculateTotal(combinedObjects.getItem1().getItems()));
+            tuple.getItem1().setTotal(calculateTotal(tuple.getItem1().getItems()));
             return resultItem;
         }).flatMap(item -> mutinySession.flush().replaceWith(item));
     }
